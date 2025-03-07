@@ -9,11 +9,11 @@ require('dotenv').config();
 router.post('/login', async (req, res) => {
     try {
         const user = new User(req.body);
-        const users = await User.findOne({ $or: [{ username: user.username }, { email: user.username }] });
+        const users = await User.findOne({ $or: [{ username: user.username }, { email: user.email }] });
         if (users) {
             const isMatch = await bcrypt.compare(user.password, users.password);
             if (!isMatch) {
-                return res.status(400).json({ error: "Mot de passe incorrect" });
+                return res.status(400).json({ message: "Mot de passe incorrect" });
             } else {
                 const token = jwt.sign(
                     { userId: user._id, role: user.role },
@@ -24,8 +24,9 @@ router.post('/login', async (req, res) => {
                     message: 'Connexion réussie',
                     token,
                     user: {
-                        username: user.username,
-                        email: user.email
+                        username: users.username,
+                        email: users.email,
+                        role : users.role
                     }
                 });
             }

@@ -5,9 +5,9 @@ const UserSchema = new mongoose.Schema({
     email: { type: String, required: true },
     password: {type:String,required:true},
     name:{type:String,required:true},
-    
-    // article: {type:Object,required:false},
-    role: { type: String, enum: ['clients', 'mecanicien','manager'], default: 'client' }
+    prenom:{type:String,required:true},
+    role: { type: String, enum: ['clients', 'mecanicien','manager'], default: 'client' },
+    photo:{type:String}
     }, { timestamps: true });
     UserSchema.pre('save', async function(next) {
         // Si le mot de passe est modifié, on le hache avant de le sauvegarder

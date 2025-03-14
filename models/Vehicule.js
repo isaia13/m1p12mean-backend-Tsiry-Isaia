@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const VehiculeSchema = new mongoose.Schema({
     marque: { type: String, required: true },
-    idUser: { type: mongoose.Schema.Types.ObjectId, required: true },
+    User: { type: mongoose.Schema.Types.ObjectId, ref:"User",required: true },
     Caractecristique: { type: Object, required: true },
     date_insertion:{type:timestamps,required:true},
     etat:{type:Int32Array,required:true},

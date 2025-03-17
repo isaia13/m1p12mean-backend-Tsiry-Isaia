@@ -29,6 +29,7 @@ var route = '/api';
 
 app.use(route+'/user', require('../routes/UserRoutes'));
 // app.use(route + '/articles', require('../routes/ArticleRoute'));
+app.use(route+'/vehicule',require('../routes/VehiculeController'))
 
 // Démarrage du serveur
 app.listen(PORT, () => console.log(`Serveur démarré sur le port ${PORT}`));

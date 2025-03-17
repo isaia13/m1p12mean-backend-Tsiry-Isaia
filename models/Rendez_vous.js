@@ -7,8 +7,8 @@ const Rendez_vousSchema = new mongoose.Schema({
         type: Number,
         default: () => Date.now() 
       ,required:true},
-    etat: { type: Int32Array, required: true,default:0 },
-    etat_rdv: { type: Int32Array, required: true ,default:0},
+    etat: { type: Number, required: true,default:0 },
+    etat_rdv: { type: Number, required: true ,default:0},
     Vehicule: { type: mongoose.Schema.Types.ObjectId,ref:"vehicule", required: true },
 }, { timestamps: true });
 module.exports = mongoose.model('rendez_vous', Rendez_vousSchema);

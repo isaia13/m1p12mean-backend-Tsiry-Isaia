@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const ServiceSchema = new mongoose.Schema({
+const Service_rdvSchema = new mongoose.Schema({
     service:{ type: mongoose.Schema.Types.ObjectId, ref: "service", default: [] },
     rendez_vous:{ type: mongoose.Schema.Types.ObjectId, ref: "rendez_vous", required:true},
     sousServicesChoisis: [
@@ -15,4 +15,4 @@ const ServiceSchema = new mongoose.Schema({
         },
       ],
 }, { timestamps: true });
-module.exports = mongoose.model('Service', ServiceSchema);
+module.exports = mongoose.model('Service_rdv', Service_rdvSchema);

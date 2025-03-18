@@ -28,6 +28,9 @@ mongoose.connect(process.env.MONGO_URI, {
 var route = '/api';
 
 app.use(route+'/user', require('../routes/UserRoutes'));
+app.use(route+'/rdv', require('../routes/RendezVousRoute'));
+app.use(route+'/vehicule', require('../routes/VehiculeRoute'));
+app.use(route+'/service', require('../routes/ServiceRoute'));
 // app.use(route + '/articles', require('../routes/ArticleRoute'));
 
 // Démarrage du serveur

@@ -1,0 +1,82 @@
+[
+    {
+        "_id": "67d57ce23e71879a23276831",
+        "date_rdv": "2025-03-15T21:00:00.000Z",
+        "etat": 0,
+        "etat_rdv": 0,
+        "Vehicule": "67d68de74ba935280eff2100",
+        "client": "67ca8fc45e095366afe78b4a",
+        "date_envoie": "2025-03-15T13:13:06.820Z",
+        "createdAt": "2025-03-15T13:13:06.827Z",
+        "updatedAt": "2025-03-15T13:13:06.827Z",
+        "__v": 0,
+        "clientInfo": {
+            "_id": "67ca8fc45e095366afe78b4a",
+            "username": "Tsiry",
+            "email": "tsiry@gmail.com",
+            "password": "$2b$10$ldHhW2WbtRI12Cfid5YKOe0KdrtiyHKDjSzKEdi90tgygwjmq4oU2",
+            "name": "Niaina",
+            "role": "clients",
+            "createdAt": "2025-03-07T06:18:44.030Z",
+            "updatedAt": "2025-03-07T06:18:44.030Z",
+            "__v": 0
+        },
+        "vehiculeInfo": {
+            "_id": "67d68de74ba935280eff2100",
+            "marque": "renault",
+            "User": "67ca8fc45e095366afe78b4a",
+            "Caractecristique": {
+                "immatriculation": "1452TAA",
+                "type": "voiture légère"
+            },
+            "date_insertion": "2025-03-27T06:18:44.030Z",
+            "etat": 0,
+            "createdAt": "2025-03-16T08:37:59.849Z",
+            "updatedAt": "2025-03-16T08:37:59.849Z",
+            "__v": 0
+        },
+        "serviceInfo": {
+            "_id": "67d5887ede0b85d46e14b7e7",
+            "service": "67d5851b91912fd3d8e1ee0a",
+            "rendez_vous": "67d57ce23e71879a23276831",
+            "sousServicesChoisis": [
+                {
+                    "sousService": "67d5860791912fd3d8e1ee0c",
+                    "etat": "en attente",
+                    "Avancement": 0,
+                    "_id": "67d5887ede0b85d46e14b7e8"
+                },
+                {
+                    "sousService": "67d6800b9f16efd0e6e8f98b",
+                    "etat": "en attente",
+                    "Avancement": 0
+                }
+            ],
+            "createdAt": "2025-03-15T14:02:38.623Z",
+            "updatedAt": "2025-03-15T14:02:38.623Z",
+            "__v": 0
+        },
+        "sousServiceInfo": [
+            {
+                "_id": "67d5860791912fd3d8e1ee0c",
+                "Service": "67d5851b91912fd3d8e1ee0a",
+                "prix": 10000,
+                "nom": "Verification moteur",
+                "commission": 15,
+                "createdAt": "2025-03-15T13:52:07.231Z",
+                "updatedAt": "2025-03-15T13:52:07.231Z",
+                "__v": 0
+            },
+            {
+                "_id": "67d6800b9f16efd0e6e8f98b",
+                "Service": "67d5851b91912fd3d8e1ee0a",
+                "prix": 20000,
+                "nom": "Verification echappement",
+                "commission": 15,
+                "createdAt": "2025-03-15T13:52:07.231Z",
+                "updatedAt": "2025-03-15T13:52:07.231Z",
+                "__v": 0
+            }
+        ]
+    }
+]

@@ -15,4 +15,4 @@ const ServiceSchema = new mongoose.Schema({
         },
       ],
 }, { timestamps: true });
-module.exports = mongoose.model('Service', ServiceSchema);
+module.exports = mongoose.model('Service_rdv', ServiceSchema);

@@ -3,11 +3,16 @@ const router = express.Router();
 const {authenticateToken,authorizeRoles}=require('../configuration/VerificationToken')
 const Rendez_vous =require('../models/Rendez_vous');
 const Service_rdv=require('../models/Service_rdv');
-const { model } = require('mongoose');
+const {getListeRendez_vous}=require('../service/Rendez_vousServce')
 
-router.get('/', async (req, res) => {
+router.get('/',authenticateToken, async (req, res) => {
     try {
-        
+        const { start_date, end_date, marque, user_name, numeroImmat, page, pageSize } = req.query;
+        const user = req.user; 
+        const filters = { start_date, end_date, marque, user_name, numeroImmat };
+        const result = await getListeRendez_vous(filters, user, parseInt(page) || 1, parseInt(pageSize) || 10);
+
+        res.status(200).json(result);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -47,7 +52,8 @@ router.put('/update-sousservice/:serviceRdvId/:sousServiceId', async (req, res) 
 
         if (!serviceRdv) {
             throw new Error('Service_rdv non trouvé');
-        }const sousService = serviceRdv.sousServicesChoisis.find(s => s.sousService.toString() === sousServiceId);
+        }
+        const sousService = serviceRdv.sousServicesChoisis.find(s => s.sousService.toString() === sousServiceId);
         if (!sousService) {
             throw new Error('Sous-service non trouvé');
         }

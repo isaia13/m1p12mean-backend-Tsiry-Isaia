@@ -8,5 +8,6 @@ const VehiculeSchema = new mongoose.Schema({
         default: () => Date.now() 
       ,required:true},
     etat:{type:Number,required:true,default:0},
+    numeroImmat:{type:String,required:true,}
     }, { timestamps: true });
 module.exports = mongoose.model('Vehicule', VehiculeSchema);

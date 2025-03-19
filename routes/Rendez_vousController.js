@@ -5,7 +5,7 @@ const Rendez_vous =require('../models/Rendez_vous');
 const Service_rdv=require('../models/Service_rdv');
 const {getListeRendez_vous}=require('../service/Rendez_vousServce')
 
-router.get('/', async (req, res) => {
+router.get('/',authenticateToken, async (req, res) => {
     try {
         const { start_date, end_date, marque, user_name, numeroImmat, page, pageSize } = req.query;
         const user = req.user; 

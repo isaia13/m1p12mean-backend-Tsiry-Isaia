@@ -1,47 +1,54 @@
 const Vehicule=require("../models/Vehicule")
+const Rendez_vous=require("../models/")
 
-async function ajout_vehicule(id_client,Caractecristique,marque){
-    const vehicule=new Vehicule({
-        user:id_client,
-        caracteristique:Caractecristique,
-        marque:marque
-    });
-    await vehicule.save();
-}
-
-async function list_vehicule(id_client){
-    const value= await Vehicule.find({ user: new ObjectId(id_client) })
-    return value;
-}
-
-async function updateVehiculeByUser(id_vehicule, id_user, caracteristique, marque) {
+const getListeRendez_vousVehicule = async (vehicule, startDate, endDate,page,pageSize) => {
     try {
-        // Vérifier si le véhicule appartient bien à l'utilisateur
-        const vehicule = await Vehicule.findOne({
-            _id: new mongoose.Types.ObjectId(id_vehicule),
-            user: new mongoose.Types.ObjectId(id_user)
-        });
+        const filter = { vehicule: vehicule };
 
-        if (!vehicule) {
-            return { success: false, message: "Véhicule non trouvé ou vous n'êtes pas autorisé à le modifier." };
+        if (startDate && endDate) {
+            filter.date_rdv = { 
+                $gte: new Date(startDate),  // date de début
+                $lte: new Date(endDate),    // date de fin
+            };
+        } else if (startDate) {
+            filter.date_rdv = { $gte: new Date(startDate) };  // Filtrer uniquement par date de début
+        } else if (endDate) {
+            filter.date_rdv = { $lte: new Date(endDate) };  // Filtrer uniquement par date de fin
         }
+        const skip = (page - 1) * pageSize;
 
-        // Mise à jour du véhicule
-        const updatedVehicule = await Vehicule.findByIdAndUpdate(
-            id_vehicule,
-            { caracteristique, marque },
-            { new: true, runValidators: true }
-        );
+        // Requête pour récupérer les rendez-vous avec pagination
+        const rendezVous = await Rendez_vous.find(filter)
+            .skip(skip)        // Ignorer les premiers résultats pour la page actuelle
+            .limit(pageSize)   // Limiter le nombre de résultats par page
+            .exec();
 
-        return { success: true, vehicule: updatedVehicule };
+        // Compter le nombre total de rendez-vous pour ce véhicule avec les mêmes filtres
+        const total = await Rendez_vous.countDocuments(filter).exec();
+
+        // Calculer le nombre total de pages
+        const totalPages = Math.ceil(total / pageSize);
+
+        return { 
+            data: rendezVous,
+            totalPages: totalPages,
+            currentPage: page,
+            totalCount: total,
+        };
     } catch (error) {
-        console.error("Erreur lors de la mise à jour du véhicule :", error);
-        return { success: false, message: "Une erreur est survenue." };
+        throw new Error(error.message);
+    }
+};
+
+const getServiceAndSousServiceByRendezVous=async(rendez_vous)=>{
+    try {
+        return await Service_rdv.find({ rendez_vous: rendez_vous })
+            .populate({ path: 'service', select: 'nom description' })
+            .populate({ path: 'sousServicesChoisis.sousService', select: 'nom description prix' })
+            .exec();
+    } catch (error) {
+        throw new Error(error.message);
     }
 }
 
-async function supprime_vehicule(id_vehicule){
-
-}
-
-module.exports=ajout_vehicule(),list_vehicule(),updateVehiculeByUser(); 
+module.exports={getListeRendez_vousVehicule,getServiceAndSousServiceByRendezVous}; 

@@ -1,7 +1,4 @@
-const Vehicule =require('../models/Vehicule')
 const Rendez_vous=require('../models/Rendez_vous')
-const Service_rdv =require('../models/Service_rdv')
-const Sous_service=require('../models/Sous_service')
 // Fonction dynamique pour récupérer les rendez-vous
 const getListeRendez_vous = async (filters = {start_date,end_date,marque,user_name,numeroImmat}, page = 1, pageSize = 10) => {
     try {
@@ -66,4 +63,4 @@ const getListeRendez_vous = async (filters = {start_date,end_date,marque,user_na
     }
 };
 
-module.exports={getListeRendez_vous,}
+module.exports={getListeRendez_vous}

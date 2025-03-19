@@ -3,10 +3,10 @@ const router = express.Router();
 const {authenticateToken,authorizeRoles}=require('../configuration/VerificationToken')
 const Rendez_vous =require('../models/Rendez_vous');
 const Service_rdv=require('../models/Service_rdv');
+const { model } = require('mongoose');
 
-router.post('/', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
-        const rendez_vous= new Rendez_vous();
         
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -59,3 +59,6 @@ router.put('/update-sousservice/:serviceRdvId/:sousServiceId', async (req, res) 
         res.status(500).json({ message: error.message });
     }
 });
+
+
+module.exports=router;

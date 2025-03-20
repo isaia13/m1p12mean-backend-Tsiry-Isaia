@@ -3,6 +3,7 @@ const router = express.Router();
 const Sous_Service = require('../models/Sous_service');
 const Service = require('../models/Service');
 const Rendez_vous = require('../models/Rendez_vous');
+///io
 
 router.post('/sous_service', async (req, res) => {
     try {
@@ -41,6 +42,39 @@ router.post('/update_rdv', async (req, res) => {
             { new: true }
         );
         res.status(200).json({ message: "Rendez-vous marquée comme vue" })
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+})
+
+router.get('/nombre_new_rdv', async (req, res) => {
+    try {
+        const { id } = req.query;
+        const result = await Rendez_vous.aggregate([
+            {
+                $group: { _id : "$etat_rdv", count : { $sum : 1 } }
+            },
+            {
+                $match: { _id : parseInt(id) }
+            }
+        ]);
+        res.status(200).send(result);
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+})
+
+router.get('/nombre_new_service_vehicule', async (req, res) => {
+    try {
+        const result = await Rendez_vous.aggregate([
+            {
+                $group: { _id : { etat_rdv : "$etat_rdv", estArrive : "$estArrive" }, count : { $sum : 1 } }
+            },
+            {
+                $match: { "_id.etat_rdv" : 1 }
+            }
+        ]);
+        res.status(200).send(result);
     } catch (error) {
         res.status(500).json({ message: error.message })
     }

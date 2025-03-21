@@ -4,6 +4,7 @@ const {authenticateToken,authorizeRoles}=require('../configuration/VerificationT
 const Rendez_vous =require('../models/Rendez_vous');
 const Service_rdv=require('../models/Service_rdv');
 const {getListeRendez_vous}=require('../service/Rendez_vousServce')
+const {getServiceAndSousServiceByRendezVous}=require('../service/VehiculeService')
 
 router.get('/',authenticateToken, async (req, res) => {
     try {
@@ -66,5 +67,17 @@ router.put('/update-sousservice/:serviceRdvId/:sousServiceId', async (req, res) 
     }
 });
 
+
+router.get('/detail:id',authenticateToken, async (req, res) => {
+    try {
+        const detail = await getServiceAndSousServiceByRendezVous(req.params.id);
+        if (!detail) {
+            return res.status(404).json({ message: 'Ce rendez-vous n a pas de service ' });
+        }
+        res.status(200).json(detail);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
 
 module.exports=router;

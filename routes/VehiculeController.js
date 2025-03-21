@@ -3,6 +3,7 @@ const router = express.Router();
 const Vehicule=require('../models/Vehicule');
 const User=require('../models/User')
 const {authenticateToken,authorizeRoles}=require('../configuration/VerificationToken');
+const{getListeRendez_vousVehicule}=require('../service/VehiculeService')
 
 
 router.post('/',authenticateToken,authorizeRoles(['client']), async (req, res) => {
@@ -35,7 +36,7 @@ router.put('/:id',authenticateToken,authorizeRoles(['client']),async (req, res) 
 });
 router.get('/',authenticateToken,authorizeRoles(['client']), async (req, res) => {
     try {
-        const vehicules = await Vehicule.find({ user: req.user._id });
+        const vehicules = await Vehicule.find({ user: req.user.id });
         if (!vehicules) {
             return res.status(404).json({ message: 'Véhicule non trouvé' });
         }
@@ -47,7 +48,7 @@ router.get('/',authenticateToken,authorizeRoles(['client']), async (req, res) =>
 
 router.get('/:id',authenticateToken,authorizeRoles(['client']), async (req, res) => {
     try {
-        const vehicule = await Vehicule.find({ user: req.user._id ,_id:req.params.id});
+        const vehicule = await Vehicule.find({ user: req.user.id ,_id:req.params.id});
         if (!vehicule) {
             return res.status(404).json({ message: 'Véhicule non trouvé' });
         }
@@ -56,6 +57,23 @@ router.get('/:id',authenticateToken,authorizeRoles(['client']), async (req, res)
         res.status(500).json({ message: error.message });
     }
 });
+
+router.get('/rendez-vous:id',authenticateToken, async (req, res) => {
+    try {
+        const { startDate, endDate,page } = req.query;
+        const rendez_vous = await getListeRendez_vousVehicule(req.params.id,startDate,endDate,page,10);
+        if (!rendez_vous) {
+            return res.status(404).json({ message: 'Pas de rendez-vous' });
+        }
+        res.status(200).json(rendez_vous);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+
+
+
 router.delete('/:id',authenticateToken,authorizeRoles(['client']),async (req, res) => {
     try {
         const user = new User(req.user);
@@ -71,7 +89,7 @@ router.delete('/:id',authenticateToken,authorizeRoles(['client']),async (req, re
             { etat: 1 },   // Champs à modifier
             { new: true }  // Option pour retourner le document mis à jour
         );
-        res.status(201).json(vehiculeupdate);
+        res.status(201).json({message:"suppression avec succes"});
     } catch (error) {
         res.status(400).json({ message: error.message });
     }

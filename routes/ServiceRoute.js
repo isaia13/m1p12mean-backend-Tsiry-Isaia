@@ -85,16 +85,16 @@ router.get('/liste_rdv', async (req, res) => {
     try {
         const result = await Rendez_vous.aggregate([
             {
-                $lookup: { from: "utilisateurs", localField: "client", foreignField: "_id", as: "clientInfo" }
-            },
-            {
-                $unwind: "$clientInfo"
-            },
-            {
                 $lookup: { from: "vehicules", localField: "Vehicule", foreignField: "_id", as: "vehiculeInfo" }
             },
             {
                 $unwind: "$vehiculeInfo"
+            },
+            {
+                $lookup: { from: "utilisateurs", localField: "vehiculeInfo.User", foreignField: "_id", as: "clientInfo" }
+            },
+            {
+                $unwind: "$clientInfo"
             },
             {
                 $lookup: { from: "service_rdvs", localField: "_id", foreignField: "rendez_vous", as: "serviceRdvInfo" }

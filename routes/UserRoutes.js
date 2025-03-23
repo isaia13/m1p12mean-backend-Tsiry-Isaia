@@ -24,6 +24,7 @@ router.post('/login', async (req, res) => {
                     message: 'Connexion réussie',
                     token,
                     user: {
+                        id : users._id,
                         username: users.username,
                         email: users.email,
                         role : users.role
@@ -70,7 +71,7 @@ router.get('/', async (req, res) => {
     }
 });
 router.put('/article', authenticateToken, authorizeRoles(['user']), async (req, res) => {
-    try {
+    try {   
         const user = new User(req.user);
         const article = req.body;
         const result = await User.findOneAndUpdate(

@@ -11,8 +11,18 @@ router.get('/',authenticateToken, async (req, res) => {
         const { start_date, end_date, marque, user_name, numeroImmat, page, pageSize } = req.query;
         const user = req.user; 
         const filters = { start_date, end_date, marque, user_name, numeroImmat };
-        const result = await getListeRendez_vous(filters, user, parseInt(page) || 1, parseInt(pageSize) || 10);
-
+        // const result = await getListeRendez_vous(filters, user, parseInt(page) || 1, parseInt(pageSize) || 10);
+        const result =  await Rendez_vous.find()
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .populate({
+            path: 'vehicule',
+            populate: {
+                path: 'user',
+                select: 'nom email'
+            }
+        })
+        .exec();
         res.status(200).json(result);
     } catch (error) {
         res.status(400).json({ message: error.message });

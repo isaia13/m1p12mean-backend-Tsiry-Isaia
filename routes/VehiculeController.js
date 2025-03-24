@@ -6,7 +6,7 @@ const User=require('../models/User')
 const {authenticateToken,authorizeRoles}=require('../configuration/VerificationToken');
 const{getListeRendez_vousVehicule}=require('../service/VehiculeService')
 
-
+// jout  d'un  vehicules
 router.post('/',authenticateToken,authorizeRoles(['client']), async (req, res) => {
     try {
         const vehicule = new Vehicule(req.body);
@@ -20,12 +20,13 @@ router.post('/',authenticateToken,authorizeRoles(['client']), async (req, res) =
         res.status(400).json({ message: error.message ,vehicule:req.body,user:req.user});
     }
 });
+
+// modifier un voiture 
 router.put('/:id',authenticateToken,authorizeRoles(['client']),async (req, res) => {
     try {
-        const user = new User(req.user);
         const vehicule = await Vehicule.findOne({
             _id: new mongoose.Types.ObjectId(req.params.id),
-            user: new mongoose.Types.ObjectId(user.userId)
+            user: new mongoose.Types.ObjectId(req.user.userIdd)
         });
         if (!vehicule) {
             return { success: false, message: "Véhicule non trouvé ou vous n'êtes pas autorisé à le modifier." };
@@ -37,6 +38,8 @@ router.put('/:id',authenticateToken,authorizeRoles(['client']),async (req, res) 
         res.status(400).json({ message: error.message });
     }
 });
+
+// voir les vehicules d'un client 
 router.get('/',authenticateToken,authorizeRoles(['client']), async (req, res) => {
     try {
         console.log(req.user);
@@ -57,7 +60,7 @@ router.get('/',authenticateToken,authorizeRoles(['client']), async (req, res) =>
         res.status(500).json({ message: error.message });
     }
 });
-
+// detail d'un voiture 
 router.get('/:id',authenticateToken,authorizeRoles(['client']), async (req, res) => {
     try {
         const vehicule = await Vehicule.find({ user: req.user.userId ,_id:req.params.id});
@@ -69,7 +72,7 @@ router.get('/:id',authenticateToken,authorizeRoles(['client']), async (req, res)
         res.status(500).json({ message: error.message });
     }
 });
-
+// voir les rendez-vous ou historique vehicule
 router.get('/rendez-vous:id',authenticateToken, async (req, res) => {
     try {
         const { startDate, endDate,page } = req.query;
@@ -83,6 +86,8 @@ router.get('/rendez-vous:id',authenticateToken, async (req, res) => {
     }
 });
 
+
+// supprimer un vehicule
 router.delete('/:id',authenticateToken,authorizeRoles(['client']),async (req, res) => {
     try {
         const user = new User(req.user);

@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const Vehicule=require('../models/Vehicule');
 const User=require('../models/User')
 const {authenticateToken,authorizeRoles}=require('../configuration/VerificationToken');
@@ -9,12 +10,14 @@ const{getListeRendez_vousVehicule}=require('../service/VehiculeService')
 router.post('/',authenticateToken,authorizeRoles(['client']), async (req, res) => {
     try {
         const vehicule = new Vehicule(req.body);
-        const user = new User(req.user);
-        vehicule.user=user.userId;
+        vehicule.user=req.user.userId;
+        console.log(vehicule);
+        
         await vehicule.save();
         res.status(201).json(vehicule);
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        
+        res.status(400).json({ message: error.message ,vehicule:req.body,user:req.user});
     }
 });
 router.put('/:id',authenticateToken,authorizeRoles(['client']),async (req, res) => {
@@ -36,9 +39,17 @@ router.put('/:id',authenticateToken,authorizeRoles(['client']),async (req, res) 
 });
 router.get('/',authenticateToken,authorizeRoles(['client']), async (req, res) => {
     try {
-        // console.log(req.user);
-        const vehicules = await Vehicule.find({ user: req.user.userId });
-        if (!vehicules) {
+        console.log(req.user);
+        if (!mongoose.Types.ObjectId.isValid(req.user.userId)) {
+            console.log("Invalid User ID");
+            // ( error:  );
+        }else{
+            console.log("Valid User ID");
+        }    
+        const vehicules = await Vehicule.find(
+            { user: new mongoose.Types.ObjectId(req.user.userId) }
+        );
+        if (vehicules.length === 0) {
             return res.status(404).json({ message: 'Véhicule non trouvé' });
         }
         res.status(200).json(vehicules);

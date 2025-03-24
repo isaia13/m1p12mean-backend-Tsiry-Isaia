@@ -3,7 +3,6 @@ require('dotenv').config(); // Charger les variables d'environnement depuis .env
 
 const authenticateToken = (req, res, next) => {
     const token = req.header('Authorization')?.replace('Bearer ', '');
-
     if (!token) {
         return res.status(401).json({ message: 'Accès refusé. Veuillez vous connecter.' });
     }

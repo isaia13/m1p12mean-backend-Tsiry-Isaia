@@ -10,7 +10,7 @@ router.post('/',authenticateToken,authorizeRoles(['client']), async (req, res) =
     try {
         const vehicule = new Vehicule(req.body);
         const user = new User(req.user);
-        vehicule.user=user.id;
+        vehicule.user=user.userId;
         await vehicule.save();
         res.status(201).json(vehicule);
     } catch (error) {
@@ -22,7 +22,7 @@ router.put('/:id',authenticateToken,authorizeRoles(['client']),async (req, res) 
         const user = new User(req.user);
         const vehicule = await Vehicule.findOne({
             _id: new mongoose.Types.ObjectId(req.params.id),
-            user: new mongoose.Types.ObjectId(user.id)
+            user: new mongoose.Types.ObjectId(user.userId)
         });
         if (!vehicule) {
             return { success: false, message: "Véhicule non trouvé ou vous n'êtes pas autorisé à le modifier." };
@@ -37,7 +37,7 @@ router.put('/:id',authenticateToken,authorizeRoles(['client']),async (req, res) 
 router.get('/',authenticateToken,authorizeRoles(['client']), async (req, res) => {
     try {
         // console.log(req.user);
-        const vehicules = await Vehicule.find({ user: req.user.id });
+        const vehicules = await Vehicule.find({ user: req.user.userId });
         if (!vehicules) {
             return res.status(404).json({ message: 'Véhicule non trouvé' });
         }
@@ -49,7 +49,7 @@ router.get('/',authenticateToken,authorizeRoles(['client']), async (req, res) =>
 
 router.get('/:id',authenticateToken,authorizeRoles(['client']), async (req, res) => {
     try {
-        const vehicule = await Vehicule.find({ user: req.user.id ,_id:req.params.id});
+        const vehicule = await Vehicule.find({ user: req.user.userId ,_id:req.params.id});
         if (!vehicule) {
             return res.status(404).json({ message: 'Véhicule non trouvé' });
         }
@@ -77,7 +77,7 @@ router.delete('/:id',authenticateToken,authorizeRoles(['client']),async (req, re
         const user = new User(req.user);
         const vehicule = await Vehicule.findOne({
             _id: new mongoose.Types.ObjectId(req.params.id),
-            user: new mongoose.Types.ObjectId(user.id)
+            user: new mongoose.Types.ObjectId(user.userId)
         });
         if (!vehicule) {
             return { success: false, message: "Véhicule non trouvé ou vous n'êtes pas autorisé à le modifier." };

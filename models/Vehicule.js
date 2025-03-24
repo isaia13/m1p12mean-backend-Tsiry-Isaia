@@ -5,5 +5,6 @@ const VehiculeSchema = new mongoose.Schema({
     Caractecristique: { type: Object, required: true },
     date_insertion:{type:Date,required:true},
     etat:{type:Number,required:true},
+    numeroImmat:{type:String,required:true}
 }, { timestamps: true });
 module.exports = mongoose.model('Vehicule', VehiculeSchema);

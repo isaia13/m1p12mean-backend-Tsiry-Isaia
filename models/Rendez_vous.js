@@ -9,6 +9,6 @@ const Rendez_vousSchema = new mongoose.Schema({
       ,required:true},
     etat: { type: Number, required: true,default:0 },
     etat_rdv: { type: Number, required: true ,default:0},
-    Vehicule: { type: mongoose.Schema.Types.ObjectId,ref:"vehicule", required: true },
+    Vehicule: { type: mongoose.Schema.Types.ObjectId,ref:"Vehicule", required: true },
 }, { timestamps: true });
 module.exports = mongoose.model('rendez_vous', Rendez_vousSchema);

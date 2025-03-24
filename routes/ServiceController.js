@@ -5,7 +5,7 @@ const { authenticateToken, authorizeRoles } = require('../configuration/Verifica
 const Sous_service = require('../models/Sous_service');
 const mongoose = require('mongoose');
 
-router.post('/', authenticateToken, authorizeRoles(['manager']), async (req, res) => {
+router.post('/', async (req, res) => {
     try {
         const service = new Service(req.body);
         await service.save();
@@ -56,7 +56,7 @@ router.put('/ajout-mecanicien:id', authenticateToken, authorizeRoles(['manager']
             _id: new mongoose.Types.ObjectId(req.params.id)
         });
         if (!service) {
-            return { success: false, message: "Service non trouvé ou vous n'êtes pas autorisé à le modifier." };
+            return { success: false, message: "Service non trouvé ou vous n'êtes pas autorisé à assigner du role." };
         }
         const result = await Service.findOneAndUpdate(
             { _id: req.params.id },
@@ -70,7 +70,7 @@ router.put('/ajout-mecanicien:id', authenticateToken, authorizeRoles(['manager']
 });
 
 
-router.get('/listes', authenticateToken, authorizeRoles(['client']), async (req, res) => {
+router.get('/listes', async (req, res) => {
     try {
         const service = await Service.find();
         res.status(201).json(service);
@@ -79,7 +79,7 @@ router.get('/listes', authenticateToken, authorizeRoles(['client']), async (req,
     }
 });
 
-router.get('/liste_sous_service', authenticateToken, authorizeRoles(['client']), async (req, res) => {
+router.get('/liste_sous_service', async (req, res) => {
     try {
         if (req.query.service) {
             if (!mongoose.Types.ObjectId.isValid(req.query.service)) {

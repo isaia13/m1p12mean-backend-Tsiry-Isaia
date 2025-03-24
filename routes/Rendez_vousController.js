@@ -6,22 +6,22 @@ const Service_rdv=require('../models/Service_rdv');
 const {getListeRendez_vous}=require('../service/Rendez_vousServce')
 const {getServiceAndSousServiceByRendezVous}=require('../service/VehiculeService')
 
-router.get('/',authenticateToken, async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const { start_date, end_date, marque, user_name, numeroImmat, page, pageSize } = req.query;
         const user = req.user; 
         const filters = { start_date, end_date, marque, user_name, numeroImmat };
         // const result = await getListeRendez_vous(filters, user, parseInt(page) || 1, parseInt(pageSize) || 10);
         const result =  await Rendez_vous.find()
-        .skip((page - 1) * pageSize)
-        .limit(pageSize)
         .populate({
-            path: 'vehicule',
+            path: 'Vehicule', // Nom exact du champ dans Rendez_vous, ici "vehicule"
             populate: {
-                path: 'user',
-                select: 'nom email'
-            }
-        })
+              path: 'user', // Référence au champ "user" dans Vehicule
+              select: 'name prenom' // On sélectionne les champs du user
+            },
+            select: 'marque numeroImmat caracteristique etat' // On sélectionne les champs pertinents du véhicule
+          })
+          .select('date_rdv etat etat_rdv')
         .exec();
         res.status(200).json(result);
     } catch (error) {
@@ -57,7 +57,7 @@ router.post('/add',authenticateToken,authorizeRoles(['client']), async (req, res
         res.status(500).json({ message: 'Erreur lors de la création du rendez-vous et des services', error: error.message });
     }
 });
-
+  
 router.put('/avancement/:serviceRdvId/:sousServiceId',authenticateToken,authorizeRoles(['mecanicien']), async (req, res) => {
     const { serviceRdvId, sousServiceId } = req.params;
     const {  Avancement } = req.body;

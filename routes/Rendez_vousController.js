@@ -48,9 +48,30 @@ router.post('/add',authenticateToken,authorizeRoles(['client']), async (req, res
     }
 });
 
-router.put('/update-sousservice/:serviceRdvId/:sousServiceId', async (req, res) => {
+router.put('/avancement/:serviceRdvId/:sousServiceId',authenticateToken,authorizeRoles(['mecanicien']), async (req, res) => {
     const { serviceRdvId, sousServiceId } = req.params;
-    const { etat, Avancement } = req.body;
+    const {  Avancement } = req.body;
+    try {
+        const serviceRdv = await Service_rdv.findById(serviceRdvId);
+
+        if (!serviceRdv) {
+            throw new Error('Service_rdv non trouvé');
+        }
+        const sousService = serviceRdv.sousServicesChoisis.find(s => s.sousService.toString() === sousServiceId);
+        if (!sousService) {
+            throw new Error('Sous-service non trouvé');
+        }
+        if (Avancement !== undefined) sousService.Avancement = Avancement;
+        await serviceRdv.save();
+        res.status(200).json(serviceRdv);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+router.put('/etat/:serviceRdvId/:sousServiceId',authenticateToken,authorizeRoles(['client']), async (req, res) => {
+    const { serviceRdvId, sousServiceId } = req.params;
+    const { etat } = req.body;
     try {
         const serviceRdv = await Service_rdv.findById(serviceRdvId);
 
@@ -62,7 +83,7 @@ router.put('/update-sousservice/:serviceRdvId/:sousServiceId', async (req, res) 
             throw new Error('Sous-service non trouvé');
         }
         if (etat) sousService.etat = etat;
-        if (Avancement !== undefined) sousService.Avancement = Avancement;
+        // if (Avancement !== undefined) sousService.Avancement = Avancement;
         await serviceRdv.save();
         res.status(200).json(serviceRdv);
     } catch (error) {

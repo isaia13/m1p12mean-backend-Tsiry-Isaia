@@ -6,7 +6,7 @@ const User=require('../models/User')
 const {authenticateToken,authorizeRoles}=require('../configuration/VerificationToken');
 const{getListeRendez_vousVehicule}=require('../service/VehiculeService')
 
-// jout  d'un  vehicules
+// Ajout  d'un  vehicules
 router.post('/',authenticateToken,authorizeRoles(['client']), async (req, res) => {
     try {
         const vehicule = new Vehicule(req.body);
@@ -42,13 +42,6 @@ router.put('/:id',authenticateToken,authorizeRoles(['client']),async (req, res) 
 // voir les vehicules d'un client 
 router.get('/',authenticateToken,authorizeRoles(['client']), async (req, res) => {
     try {
-        console.log(req.user);
-        if (!mongoose.Types.ObjectId.isValid(req.user.userId)) {
-            console.log("Invalid User ID");
-            // ( error:  );
-        }else{
-            console.log("Valid User ID");
-        }    
         const vehicules = await Vehicule.find(
             { user: new mongoose.Types.ObjectId(req.user.userId) }
         );

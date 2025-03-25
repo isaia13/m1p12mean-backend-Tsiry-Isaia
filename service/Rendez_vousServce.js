@@ -41,12 +41,14 @@ const getListeRendez_vous = async (filters = { start_date, end_date, marque, use
             .skip((page - 1) * pageSize)
             .limit(pageSize)
             .populate({
-                path: 'vehicule',
+                path: 'Vehicule', // Nom exact du champ dans Rendez_vous, ici "vehicule"
                 populate: {
-                    path: 'user',
-                    select: 'nom email'
-                }
-            })
+                  path: 'user', // Référence au champ "user" dans Vehicule
+                  select: 'name prenom' // On sélectionne les champs du user
+                },
+                select: 'marque numeroImmat caracteristique etat' // On sélectionne les champs pertinents du véhicule
+              })
+              .select('date_rdv etat etat_rdv')
             .exec();
 
         // Compter le nombre total de résultats

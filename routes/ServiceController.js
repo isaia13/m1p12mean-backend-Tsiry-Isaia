@@ -5,6 +5,7 @@ const { authenticateToken, authorizeRoles } = require('../configuration/Verifica
 const Sous_service = require('../models/Sous_service');
 const mongoose = require('mongoose');
 
+// Ajout d'un service
 router.post('/', async (req, res) => {
     try {
         const service = new Service(req.body);
@@ -14,6 +15,7 @@ router.post('/', async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 });
+// modification d'un service
 router.put('/:id', authenticateToken, authorizeRoles(['manager']), async (req, res) => {
     try {
         const service = await Service.findOne({
@@ -29,7 +31,7 @@ router.put('/:id', authenticateToken, authorizeRoles(['manager']), async (req, r
         res.status(400).json({ message: error.message });
     }
 });
-
+// Suppression d'un sous service
 router.delete('/:id', authenticateToken, authorizeRoles(['manager']), async (req, res) => {
     try {
         const service = await Service.findOne({
@@ -49,7 +51,7 @@ router.delete('/:id', authenticateToken, authorizeRoles(['manager']), async (req
     }
 });
 
-
+// attribution d'un role avec un ou des mecanicien 
 router.put('/ajout-mecanicien:id', authenticateToken, authorizeRoles(['manager']), async (req, res) => {
     try {
         const service = await Service.findOne({
@@ -69,7 +71,7 @@ router.put('/ajout-mecanicien:id', authenticateToken, authorizeRoles(['manager']
     }
 });
 
-
+// Liste de service
 router.get('/listes', async (req, res) => {
     try {
         const service = await Service.find();
@@ -78,7 +80,7 @@ router.get('/listes', async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 });
-
+//liste sous-service
 router.get('/liste_sous_service', async (req, res) => {
     try {
         if (req.query.service) {
@@ -91,7 +93,7 @@ router.get('/liste_sous_service', async (req, res) => {
             });
             res.status(201).json(sous_service);
         } else {
-            res.status(201).json([]);
+            res.status(201).json({message:"service pas de sous-service"});
         }
     } catch (error) { 
         res.status(400).json({ message: error.message });

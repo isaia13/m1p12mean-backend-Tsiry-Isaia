@@ -2,8 +2,9 @@ const Vehicule = require('../models/Vehicule');
 const express = require('express');
 const router = express.Router();
 const Rendez_vous = require('../models/Rendez_vous');
+const { authenticateToken, authorizeRoles } = require('../configuration/VerificationToken');
 
-router.post('/nouveau',async (req, res) => {
+router.post('/nouveau',authenticateToken,async (req, res) => {
     try {
         const vehicule = new Vehicule(req.body);
         await vehicule.save();
@@ -13,7 +14,7 @@ router.post('/nouveau',async (req, res) => {
     }
 })
 
-router.get('/service', async (req, res) => {
+router.get('/service',authenticateToken, async (req, res) => {
     try {
         const result = await Rendez_vous.aggregate([
             {

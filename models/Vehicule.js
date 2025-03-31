@@ -4,7 +4,7 @@ const VehiculeSchema = new mongoose.Schema({
     user: { type: mongoose.Schema.Types.ObjectId, ref:"Utilisateur",required: true },
     caracteristique: { type: Object, required: true },
     date_insertion:{
-        type: Number,
+        type: Date,
         default: () => Date.now() 
       ,required:true},
     etat:{type:Number,required:true,default:0},

@@ -26,7 +26,7 @@ router.put('/:id',authenticateToken,authorizeRoles(['client']),async (req, res) 
     try {
         const vehicule = await Vehicule.findOne({
             _id: new mongoose.Types.ObjectId(req.params.id),
-            user: new mongoose.Types.ObjectId(req.user.userIdd)
+            user: new mongoose.Types.ObjectId(req.user.userId)
         });
         if (!vehicule) {
             return { success: false, message: "Véhicule non trouvé ou vous n'êtes pas autorisé à le modifier." };
@@ -93,7 +93,7 @@ router.delete('/:id',authenticateToken,authorizeRoles(['client']),async (req, re
         const user = new User(req.user);
         const vehicule = await Vehicule.findOne({
             _id: new mongoose.Types.ObjectId(req.params.id),
-            user: new mongoose.Types.ObjectId(user.userId)
+            user: new mongoose.Types.ObjectId(req.user.userId)
         });
         if (!vehicule) {
             return { success: false, message: "Véhicule non trouvé ou vous n'êtes pas autorisé à le modifier." };

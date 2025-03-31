@@ -1,5 +1,6 @@
 const Vehicule=require("../models/Vehicule")
-const Rendez_vous=require("../models/Rendez_vous")
+const Rendez_vous=require("../models/Rendez_vous");
+const Service_rdv = require("../models/Service_rdv");
 
 const getListeRendez_vousVehicule = async (vehicule, startDate, endDate,page,pageSize) => {
     try {

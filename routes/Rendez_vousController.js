@@ -128,7 +128,7 @@ router.put('/etat/:serviceRdvId/:sousServiceId', authenticateToken, authorizeRol
     }
 });
 
-router.get('/detail:id', authenticateToken, async (req, res) => {
+router.get('/detail/:id', authenticateToken, async (req, res) => {
     try {
         const detail = await getServiceAndSousServiceByRendezVous(req.params.id);
         if (!detail) {

@@ -1,34 +1,49 @@
 const express = require('express');
 const router = express.Router();
-const {authenticateToken,authorizeRoles}=require('../configuration/VerificationToken')
-const Rendez_vous =require('../models/Rendez_vous');
-const Service_rdv=require('../models/Service_rdv');
-const {getListeRendez_vous}=require('../service/Rendez_vousServce')
-const {getServiceAndSousServiceByRendezVous}=require('../service/VehiculeService')
+const { authenticateToken, authorizeRoles } = require('../configuration/VerificationToken')
+const Rendez_vous = require('../models/Rendez_vous');
+const Service_rdv = require('../models/Service_rdv');
+const { getListeRendez_vous } = require('../service/Rendez_vousServce')
+const { getServiceAndSousServiceByRendezVous } = require('../service/VehiculeService');
+const mongoose = require('mongoose');
 
 router.get('/', async (req, res) => {
     try {
         const { start_date, end_date, marque, user_name, numeroImmat, page, pageSize } = req.query;
-        const user = req.user; 
+        const user = req.user;
         const filters = { start_date, end_date, marque, user_name, numeroImmat };
         // const result = await getListeRendez_vous(filters, user, parseInt(page) || 1, parseInt(pageSize) || 10);
-        const result =  await Rendez_vous.find()
-        .populate({
-            path: 'Vehicule', // Nom exact du champ dans Rendez_vous, ici "vehicule"
-            populate: {
-              path: 'user', // Référence au champ "user" dans Vehicule
-              select: 'name prenom' // On sélectionne les champs du user
-            },
-            select: 'marque numeroImmat caracteristique etat' // On sélectionne les champs pertinents du véhicule
-          })
-          .select('date_rdv etat etat_rdv')
-        .exec();
+        const result = await Service_rdv.find()
+            .populate({
+                path: 'rendez_vous', // Le champ que vous souhaitez peupler dans votre document.
+                populate: {
+                    path: 'Vehicule', // Le champ que vous voulez peupler dans "rendez_vous" (référence à un véhicule).
+                    populate: {
+                        path: 'user', // Référence au champ "user" dans "Vehicule".
+                        select: 'name prenom' // Sélectionner les champs de l'utilisateur.
+                    },
+                    select: 'marque numeroImmat caracteristique etat' // Sélectionner les champs du véhicule.
+                },
+                select: 'date_rdv date_envoie etat etat_rdv' // Sélectionner les champs du rendez-vous que vous voulez voir.
+            })
+            .populate({
+                path: 'service', // Peupler la référence "service" dans votre modèle Service_rdv.
+                select: 'nom prix_annulation promotion mecanicien'
+            })
+            .populate({
+                path: 'sousServicesChoisis.sousService',
+                select: 'nom prix commission'
+            })
+            .select('sousServicesChoisis createdAt updatedAt') // Sélectionner les autres champs de votre collection Service_rdv.
+            .exec();
+
+
         res.status(200).json(result);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
 });
-router.post('/add',authenticateToken,authorizeRoles(['client']), async (req, res) => {
+router.post('/add', authenticateToken, authorizeRoles(['client']), async (req, res) => {
     const { date_rdv, Vehicule, services } = req.body;  // Récupérer les données de la requête
     const date = new Date(date_rdv);
     const offset = date.getTimezoneOffset(); // Obtenir le décalage en minutes
@@ -36,10 +51,10 @@ router.post('/add',authenticateToken,authorizeRoles(['client']), async (req, res
     try {
 
         const newRdv = new Rendez_vous({
-            date_rdv : date.toISOString(),
+            date_rdv: date.toISOString(),
             Vehicule,
-            etat: 0, 
-            etat_rdv: 0 
+            etat: 0,
+            etat_rdv: 0
         });
         const savedRdv = await newRdv.save();
         const servicePromises = services.map(async (service) => {
@@ -57,10 +72,10 @@ router.post('/add',authenticateToken,authorizeRoles(['client']), async (req, res
         res.status(500).json({ message: 'Erreur lors de la création du rendez-vous et des services', error: error.message });
     }
 });
-  
-router.put('/avancement/:serviceRdvId/:sousServiceId',authenticateToken,authorizeRoles(['mecanicien']), async (req, res) => {
+
+router.put('/avancement/:serviceRdvId/:sousServiceId', authenticateToken, authorizeRoles(['mecanicien']), async (req, res) => {
     const { serviceRdvId, sousServiceId } = req.params;
-    const {  Avancement } = req.body;
+    const { Avancement } = req.body;
     try {
         const serviceRdv = await Service_rdv.findById(serviceRdvId);
 
@@ -79,7 +94,7 @@ router.put('/avancement/:serviceRdvId/:sousServiceId',authenticateToken,authoriz
     }
 });
 
-router.put('/etat/:serviceRdvId/:sousServiceId',authenticateToken,authorizeRoles(['client']), async (req, res) => {
+router.put('/etat/:serviceRdvId/:sousServiceId', authenticateToken, authorizeRoles(['client']), async (req, res) => {
     const { serviceRdvId, sousServiceId } = req.params;
     const { etat } = req.body;
     try {
@@ -102,7 +117,7 @@ router.put('/etat/:serviceRdvId/:sousServiceId',authenticateToken,authorizeRoles
 });
 
 
-router.get('/detail:id',authenticateToken, async (req, res) => {
+router.get('/detail:id', authenticateToken, async (req, res) => {
     try {
         const detail = await getServiceAndSousServiceByRendezVous(req.params.id);
         if (!detail) {
@@ -114,4 +129,50 @@ router.get('/detail:id',authenticateToken, async (req, res) => {
     }
 });
 
-module.exports=router;
+router.delete('/delete-sous-service/:id', authenticateToken, authorizeRoles(['client']), async (req, res) => {
+    try {
+        const sup = await Service_rdv.updateOne(
+            { 'sousServicesChoisis._id': new mongoose.Types.ObjectId(req.params.id) },
+            { $pull: { sousServicesChoisis: { _id: new mongoose.Types.ObjectId(req.params.id) } } });
+        res.status(201).json({ message: 'Sous-service anullé avec succès' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+router.delete('/delete-rdv/:id', authenticateToken, authorizeRoles(['client']), async (req, res) => {
+    try {
+        const sup = await Rendez_vous.updateOne(
+            { _id: new mongoose.Types.ObjectId(req.params.id) },
+            { $set: { etat : 2 } } );
+        res.status(201).json({ message: 'Rendez-vous supprimé avec succès' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+router.put('/valider-sous-service/:id', async (req, res) => {
+    try {
+        const sup = await Service_rdv.updateOne(
+            { _id: new mongoose.Types.ObjectId(req.params.id) },
+            { $set: { "sousServicesChoisis.$[].etat": "valider" } } 
+        );
+        res.status(200).json({ message: 'Tous les sous-services ont été validés avec succès' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }    
+});
+
+router.put('/reporter-rdv/:id', async (req, res) => {
+    try {
+        const sup = await Rendez_vous.updateOne(
+            { _id: new mongoose.Types.ObjectId(req.params.id) },
+            { $set: { etat: 1 } } 
+        );
+        res.status(200).json({ message: 'Votre Rendez-vous a été reportés avec succès' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }    
+});
+
+module.exports = router;

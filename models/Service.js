@@ -6,4 +6,4 @@ promotion:[{type:Object, default :[]}],
 mecanicien:[{ type: mongoose.Schema.Types.ObjectId, ref: "user", default: [] }],
 etat :{type:Number,default :0}
 }, { timestamps: true });
-module.exports = mongoose.model('Service', ServiceSchema);
+module.exports = mongoose.model('service', ServiceSchema);

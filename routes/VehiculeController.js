@@ -42,7 +42,6 @@ router.put('/:id',authenticateToken,authorizeRoles(['client']),async (req, res) 
 // voir les vehicules d'un client 
 router.get('/',authenticateToken,authorizeRoles(['client']), async (req, res) => {
     try {
-        console.log(req.user);
         if (!mongoose.Types.ObjectId.isValid(req.user.userId)) {
             console.log("Invalid User ID");
             // ( error:  );

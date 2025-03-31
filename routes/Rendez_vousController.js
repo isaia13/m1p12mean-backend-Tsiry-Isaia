@@ -8,7 +8,7 @@ const {getServiceAndSousServiceByRendezVous}=require('../service/VehiculeService
 
 
 // liste des rendez-vous avec le recherche avancer
-router.get('/',authenticateToken, async (req, res) => {
+router.get('/manager/',authenticateToken, async (req, res) => {
     try {
         const { start_date, end_date, marque, user_name, numeroImmat, page, pageSize } = req.query;
         const user = req.user; 

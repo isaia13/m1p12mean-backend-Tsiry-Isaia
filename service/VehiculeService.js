@@ -1,5 +1,6 @@
 const Vehicule=require("../models/Vehicule")
 const Rendez_vous=require("../models/Rendez_vous")
+const Service_rdv=require("../models/Service_rdv")
 
 const getListeRendez_vousVehicule = async (vehicule, startDate, endDate,page,pageSize) => {
     try {
@@ -47,6 +48,7 @@ const getServiceAndSousServiceByRendezVous=async(rendez_vous)=>{
             .populate({ path: 'sousServicesChoisis.sousService', select: 'nom description prix' })
             .exec();
     } catch (error) {
+        console.log(error.message);
         throw new Error(error.message);
     }
 }

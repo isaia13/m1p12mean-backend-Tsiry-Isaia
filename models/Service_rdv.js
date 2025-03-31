@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Service_rdvSchema = new mongoose.Schema({
-    service:{ type: mongoose.Schema.Types.ObjectId, ref: "service", default: [] },
+    service:{ type: mongoose.Schema.Types.ObjectId, ref: "Service", default: [] },
     rendez_vous:{ type: mongoose.Schema.Types.ObjectId, ref: "rendez_vous", required:true},
     sousServicesChoisis: [
         {

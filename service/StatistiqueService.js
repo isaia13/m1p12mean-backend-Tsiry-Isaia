@@ -1,82 +1,69 @@
 const Payement=require('../models/Payement')
 const getChiffreAffaireParAnnee = async (req, res) => {
-    const { startDate, endDate } = req.query; // Date de début et de fin pour filtrer les années (optionnel)
-
+    const { startDate, endDate } = req.query; 
     const value = await Payement.aggregate([
-        // Étape 1 : Filtrer les paiements dans la plage de dates
         {
             $match: {
                 date: { 
-                    $gte: new Date(startDate), // Filtrer les paiements à partir de startDate
-                    $lte: new Date(endDate)    // Filtrer jusqu'à endDate
+                    $gte: new Date(startDate),
+                    $lte: new Date(endDate)
                 }
             }
         },
-        // Étape 2 : Extraire l'année
         {
             $project: {
-                annee: { $year: { date: "$date" } }, // Extraire l'année
-                prix: 1 // Garder le prix pour l'agrégation
+                annee: { $year: { date: "$date" } },
+                prix: 1
             }
         },
-        // Étape 3 : Grouper par année
         {
             $group: {
-                _id: "$annee", // Regrouper par année
-                total: { $sum: "$prix" } // Calculer le total par année
+                _id: "$annee",
+                total: { $sum: "$prix" }
             }
         },
-        // Étape 4 : Trier par année croissante
         {
-            $sort: { "_id": 1 } // Trier par année croissante
+            $sort: { "_id": 1 }
         }
     ]);
 
-    res.json(value); // Renvoie les résultats sous forme de réponse JSON
+    res.json(value);
 };
 
 
 const getChiffreAffaireParMois = async (req, res) => {
-    const { annee } = req.query; // Année donnée pour filtrer
-
+    const { annee } = req.query;
     const value = await Payement.aggregate([
-        // Étape 1 : Filtrer les paiements pour l'année spécifiée
         {
             $match: {
                 date: { 
-                    $gte: new Date(`${annee}-01-01`), // Filtrer à partir du début de l'année
-                    $lte: new Date(`${annee}-12-31`)  // Filtrer jusqu'à la fin de l'année
+                    $gte: new Date(`${annee}-01-01`),
+                    $lte: new Date(`${annee}-12-31`)
                 }
             }
         },
-        // Étape 2 : Extraire le mois et l'année
         {
             $project: {
-                mois: { $month: { date: "$date" } }, // Extraire le mois
-                annee: { $year: { date: "$date" } }, // Extraire l'année
-                prix: 1 // Garder le prix pour l'agrégation
+                mois: { $month: { date: "$date" } },
+                annee: { $year: { date: "$date" } },
+                prix: 1
             }
         },
-        // Étape 3 : Grouper par mois et année
         {
             $group: {
-                _id: { mois: "$mois", annee: "$annee" }, // Grouper par mois et année
-                total: { $sum: "$prix" } // Calculer le total par mois
+                _id: { mois: "$mois", annee: "$annee" },
+                total: { $sum: "$prix" }
             }
         },
-        // Étape 4 : Trier par mois croissant
         {
-            $sort: { "_id.mois": 1 } // Trier par mois croissant
+            $sort: { "_id.mois": 1 }
         }
     ]);
-
-    res.json(value); // Renvoie les résultats sous forme de réponse JSON
+    res.json(value);
 };
 const getChiffreAffaireParJour = async (req, res) => {
-    const { annee, mois } = req.query; // Année et mois spécifiés
-
+    const { annee, mois } = req.query;
     const value = await Payement.aggregate([
-        // Étape 1 : Filtrer les paiements pour le mois et l'année spécifiés
         {
             $match: {
                 date: { 

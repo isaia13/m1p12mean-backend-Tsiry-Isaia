@@ -12,4 +12,6 @@ Backend du projet
 
 # manager 
     ** liste des rendez_vous avec les recherche avancer et paginations
-    **
+    ** Service et sous-service 
+    ** Assignation de role avec un ou des mecanicien 
+    

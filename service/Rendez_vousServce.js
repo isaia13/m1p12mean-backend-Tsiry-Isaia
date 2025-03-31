@@ -50,7 +50,6 @@ const getListeRendez_vous = async (filters = { start_date, end_date, marque, use
               })
               .select('date_rdv etat etat_rdv')
             .exec();
-
         // Compter le nombre total de résultats
         const total = await Rendez_vous.countDocuments(filter).exec();
         const totalPages = Math.ceil(total / pageSize);

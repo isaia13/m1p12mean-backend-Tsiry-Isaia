@@ -7,7 +7,9 @@ const { getListeRendez_vous } = require('../service/Rendez_vousServce')
 const { getServiceAndSousServiceByRendezVous } = require('../service/VehiculeService');
 const mongoose = require('mongoose');
 
-router.get('/', async (req, res) => {
+
+// liste des rendez-vous avec le recherche avancer
+router.get('/',authenticateToken, async (req, res) => {
     try {
         const { start_date, end_date, marque, user_name, numeroImmat, page, pageSize } = req.query;
         const user = req.user;
@@ -35,15 +37,14 @@ router.get('/', async (req, res) => {
                 select: 'nom prix commission'
             })
             .select('sousServicesChoisis createdAt updatedAt') // Sélectionner les autres champs de votre collection Service_rdv.
-            .exec();
-
-
+            .exec()
         res.status(200).json(result);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
 });
 router.post('/add', authenticateToken, authorizeRoles(['client']), async (req, res) => {
+
     const { date_rdv, Vehicule, services } = req.body;  // Récupérer les données de la requête
     const date = new Date(date_rdv);
     const offset = date.getTimezoneOffset(); // Obtenir le décalage en minutes
@@ -72,7 +73,6 @@ router.post('/add', authenticateToken, authorizeRoles(['client']), async (req, r
         res.status(500).json({ message: 'Erreur lors de la création du rendez-vous et des services', error: error.message });
     }
 });
-
 router.put('/avancement/:serviceRdvId/:sousServiceId', authenticateToken, authorizeRoles(['mecanicien']), async (req, res) => {
     const { serviceRdvId, sousServiceId } = req.params;
     const { Avancement } = req.body;
@@ -93,7 +93,6 @@ router.put('/avancement/:serviceRdvId/:sousServiceId', authenticateToken, author
         res.status(500).json({ message: error.message });
     }
 });
-
 router.put('/etat/:serviceRdvId/:sousServiceId', authenticateToken, authorizeRoles(['client']), async (req, res) => {
     const { serviceRdvId, sousServiceId } = req.params;
     const { etat } = req.body;
@@ -115,7 +114,6 @@ router.put('/etat/:serviceRdvId/:sousServiceId', authenticateToken, authorizeRol
         res.status(500).json({ message: error.message });
     }
 });
-
 
 router.get('/detail:id', authenticateToken, async (req, res) => {
     try {

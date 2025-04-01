@@ -115,7 +115,7 @@ router.get('/liste_rdv', authenticateToken, async (req, res) => {
             },
             { $unwind: "$vehiculeInfo" },
             {
-                $lookup: { from: "utilisateurs", localField: "vehiculeInfo.User", foreignField: "_id", as: "clientInfo" }
+                $lookup: { from: "utilisateurs", localField: "vehiculeInfo.user", foreignField: "_id", as: "clientInfo" }
             },
             { $unwind: "$clientInfo" },
             {
@@ -270,7 +270,49 @@ router.get('/liste_par_service/:id',authenticateToken, async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 
+});
+
+router.put('/updateAvancement/:id', async (req, res) => {
+    try {
+        const result = await Service_rdv.aggregate([
+            {
+              $match: { _id: new mongoose.Types.ObjectId(req.params.id) }
+            },
+            {
+              $unwind: "$sousServicesChoisis"
+            },
+            {
+              $group: {
+                _id: { _id : "$_id", rendez_vous : "$rendez_vous" },
+                avancement: { $avg: "$sousServicesChoisis.Avancement" }
+              }
+            },
+            {
+              $addFields: {
+                avancement: "$avancement"
+              }
+            }
+          ]);
+          modifieRendezVous(result);
+          res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({ message: error.message})
+    }
 })
+
+
+async function modifieRendezVous(data) {
+    for (const res of data) {
+      try {
+        const up = await Rendez_vous.updateOne({ _id: res._id.rendez_vous, Avancement : res.avancement })
+        const result = await Rendez_vous.findOne({ _id: res._id.rendez_vous });
+        console.log(result);
+      } catch (err) {
+        console.error("Erreur lors de la récupération du rendez-vous:", err);
+      }
+    }
+  }
+  
 
 
 module.exports = router;

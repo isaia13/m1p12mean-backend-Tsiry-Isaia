@@ -30,7 +30,7 @@ router.get('/service',authenticateToken, async (req, res) => {
                 $unwind : "$vehiculeInfo"
             },
             {
-                $lookup : { from: "utilisateurs", localField: "vehiculeInfo.User", foreignField: "_id", as: "clientInfo" }
+                $lookup : { from: "utilisateurs", localField: "vehiculeInfo.user", foreignField: "_id", as: "clientInfo" }
             },
             {
                 $unwind : "$clientInfo"

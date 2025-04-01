@@ -11,6 +11,7 @@ const Rendez_vousSchema = new mongoose.Schema({
     etat_rdv: { type: Number, required: true ,default:0},//0: en attente, 1: vue, 
     estArrive : { type:Number, default: 0 },// 1: arrivée
     Vehicule: { type: mongoose.Schema.Types.ObjectId,ref:"vehicule", required: true },
-    client: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }
+    client: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    Avancement :{ type: Number, default: 0.0 }
 }, { timestamps: true });
 module.exports = mongoose.model('rendez_vous', Rendez_vousSchema);

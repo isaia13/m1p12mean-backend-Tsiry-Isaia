@@ -18,7 +18,7 @@ router.post('/login', async (req, res) => {
                 return res.status(400).json({ message: "Mot de passe incorrect" });
             } else {
                 const token = jwt.sign(
-                    { userId: user._id, role: user.role },
+                    { userId: users._id, role: users.role ,email:users.email },
                     process.env.JWT_SECRET,
                     { expiresIn: '1h' }
                 );

@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const Vehicule=require('../models/Vehicule');
-const User=require('../models/User')
+const User=require('../models/User');
+const Rendez_vous = require('../models/Rendez_vous');
 const {authenticateToken,authorizeRoles}=require('../configuration/VerificationToken');
 const{getListeRendez_vousVehicule}=require('../service/VehiculeService')
 
@@ -26,7 +27,7 @@ router.put('/:id',authenticateToken,authorizeRoles(['client']),async (req, res) 
     try {
         const vehicule = await Vehicule.findOne({
             _id: new mongoose.Types.ObjectId(req.params.id),
-            user: new mongoose.Types.ObjectId(req.user.userIdd)
+            user: new mongoose.Types.ObjectId(req.user.userId)
         });
         if (!vehicule) {
             return { success: false, message: "Véhicule non trouvé ou vous n'êtes pas autorisé à le modifier." };
@@ -42,6 +43,13 @@ router.put('/:id',authenticateToken,authorizeRoles(['client']),async (req, res) 
 // voir les vehicules d'un client 
 router.get('/',authenticateToken,authorizeRoles(['client']), async (req, res) => {
     try {
+        console.log(req.user);
+        if (!mongoose.Types.ObjectId.isValid(req.user.userId)) {
+            console.log("Invalid User ID");
+            // ( error:  );
+        }else{
+            console.log("Valid User ID");
+        }    
         const vehicules = await Vehicule.find(
             { user: new mongoose.Types.ObjectId(req.user.userId) }
         );
@@ -86,7 +94,7 @@ router.delete('/:id',authenticateToken,authorizeRoles(['client']),async (req, re
         const user = new User(req.user);
         const vehicule = await Vehicule.findOne({
             _id: new mongoose.Types.ObjectId(req.params.id),
-            user: new mongoose.Types.ObjectId(user.userId)
+            user: new mongoose.Types.ObjectId(req.user.userId)
         });
         if (!vehicule) {
             return { success: false, message: "Véhicule non trouvé ou vous n'êtes pas autorisé à le modifier." };
@@ -101,7 +109,6 @@ router.delete('/:id',authenticateToken,authorizeRoles(['client']),async (req, re
         res.status(400).json({ message: error.message });
     }
 });
-
 
 
 module.exports=router;

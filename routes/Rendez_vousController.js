@@ -9,10 +9,10 @@ const mongoose = require('mongoose');
 
 
 // pour le manager
-router.get('/manager',authenticateToken, async (req, res) => {
+router.get('/manager', authenticateToken, async (req, res) => {
     try {
         const { start_date, end_date, marque, user_name, numeroImmat, page, pageSize } = req.query;
-        const user = req.user; 
+        const user = req.user;
         const filters = { start_date, end_date, marque, user_name, numeroImmat };
         const result = await getListeRendez_vous(filters, user, parseInt(page) || 1, parseInt(pageSize) || 10);
         res.status(200).json(result);
@@ -22,36 +22,38 @@ router.get('/manager',authenticateToken, async (req, res) => {
 });
 
 // liste des rendez-vous avec le recherche avancer
-router.get('/',authenticateToken, async (req, res) => {
+router.get('/', authenticateToken, authorizeRoles(['client']), async (req, res) => {
     try {
         const { start_date, end_date, marque, user_name, numeroImmat, page, pageSize } = req.query;
         const user = req.user;
+        console.log(req.user);
         const filters = { start_date, end_date, marque, user_name, numeroImmat };
-        // const result = await getListeRendez_vous(filters, user, parseInt(page) || 1, parseInt(pageSize) || 10);
         const result = await Service_rdv.find()
             .populate({
-                path: 'rendez_vous', // Le champ que vous souhaitez peupler dans votre document.
+                path: 'rendez_vous',
                 populate: {
-                    path: 'Vehicule', // Le champ que vous voulez peupler dans "rendez_vous" (référence à un véhicule).
+                    path: 'Vehicule',
                     populate: {
-                        path: 'user', // Référence au champ "user" dans "Vehicule".
-                        select: 'name prenom' // Sélectionner les champs de l'utilisateur.
+                        path: 'user',
+                        select: 'name prenom'
                     },
-                    select: 'marque numeroImmat caracteristique etat' // Sélectionner les champs du véhicule.
+                    select: 'marque numeroImmat caracteristique etat'
                 },
-                select: 'date_rdv date_envoie etat etat_rdv' // Sélectionner les champs du rendez-vous que vous voulez voir.
+                select: 'date_rdv date_envoie etat etat_rdv'
             })
             .populate({
-                path: 'service', // Peupler la référence "service" dans votre modèle Service_rdv.
+                path: 'service',
                 select: 'nom prix_annulation promotion mecanicien'
             })
             .populate({
                 path: 'sousServicesChoisis.sousService',
                 select: 'nom prix commission'
             })
-            .select('sousServicesChoisis createdAt updatedAt') // Sélectionner les autres champs de votre collection Service_rdv.
-            .exec()
+            .select('sousServicesChoisis createdAt updatedAt')
+            .exec();
+
         res.status(200).json(result);
+
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -155,7 +157,7 @@ router.delete('/delete-rdv/:id', authenticateToken, authorizeRoles(['client']), 
     try {
         const sup = await Rendez_vous.updateOne(
             { _id: new mongoose.Types.ObjectId(req.params.id) },
-            { $set: { etat : 2 } } );
+            { $set: { etat: 2 } });
         res.status(201).json({ message: 'Rendez-vous supprimé avec succès' });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -166,24 +168,24 @@ router.put('/valider-sous-service/:id', async (req, res) => {
     try {
         const sup = await Service_rdv.updateOne(
             { _id: new mongoose.Types.ObjectId(req.params.id) },
-            { $set: { "sousServicesChoisis.$[].etat": "valider" } } 
+            { $set: { "sousServicesChoisis.$[].etat": "valider" } }
         );
         res.status(200).json({ message: 'Tous les sous-services ont été validés avec succès' });
     } catch (error) {
         res.status(500).json({ message: error.message });
-    }    
+    }
 });
 
 router.put('/reporter-rdv/:id', async (req, res) => {
     try {
         const sup = await Rendez_vous.updateOne(
             { _id: new mongoose.Types.ObjectId(req.params.id) },
-            { $set: { etat: 1 } } 
+            { $set: { etat: 1 } }
         );
         res.status(200).json({ message: 'Votre Rendez-vous a été reportés avec succès' });
     } catch (error) {
         res.status(500).json({ message: error.message });
-    }    
+    }
 });
 
 module.exports = router;

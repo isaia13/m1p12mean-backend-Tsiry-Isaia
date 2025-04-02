@@ -3,11 +3,13 @@ const router = express.Router();
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 const { authenticateToken, authorizeRoles } = require('../configuration/VerificationToken');
 require('dotenv').config();
 // faire un login
 router.post('/login', async (req, res) => {
     try {
+        console.log(req.body);
         const user = new User(req.body);
         const users = await User.findOne({ $or: [{ username: user.username }, { email: user.email }] });
         if (users) {
@@ -16,7 +18,7 @@ router.post('/login', async (req, res) => {
                 return res.status(400).json({ message: "Mot de passe incorrect" });
             } else {
                 const token = jwt.sign(
-                    { userId: users._id, role: users.role ,email:users.email},
+                    { userId: user._id, role: user.role },
                     process.env.JWT_SECRET,
                     { expiresIn: '1h' }
                 );
@@ -24,12 +26,41 @@ router.post('/login', async (req, res) => {
                     message: 'Connexion réussie',
                     token,
                     user: {
-                        id : users._id,
+                        id: users._id,
                         username: users.username,
                         email: users.email,
-                        role : users.role
+                        role: users.role
                     }
                 });
+            }
+        } else {
+            res.status(404).json({ message: 'Utilisateur non existant veuiller se connecter' })
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: error.message });
+    }
+});
+
+router.put('/update/:id', async (req, res) => {
+    const { username, email, password, new_password } = req.body;
+
+    try {
+        const users = await User.findById(new mongoose.Types.ObjectId(req.params.id));
+        if (users) {
+            const isMatch = await bcrypt.compare(password, users.password);
+            if (!isMatch) {
+                return res.status(400).json({ message: "Mot de passe incorrect" });
+            } else {
+                users.username = username || users.username;
+                users.email = email || users.email;
+            
+                if (new_password) {
+                  users.password = new_password;
+                }
+                await users.save();
+                console.log('Profil mis à jour avec succès');
+                res.status(200).json({ message: 'Profil mis à jour avec succès'});
             }
         } else {
             res.status(404).json({ message: 'Utilisateur non existant veuiller se connecter' })
@@ -45,7 +76,7 @@ router.post('/register', async (req, res) => {
 
         const user = new User(req.body);
         const liste = await User.find({ $or: [{ username: user.username }, { email: user.email }] });
-        if (liste.length>0) {
+        if (liste.length > 0) {
             return res.status(400).json({ message: "Utilisateur existant" });
         } else {
             console.log(user.password);
@@ -70,8 +101,22 @@ router.get('/', async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
+
+router.get('/:id', async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) {
+            return res.status(404).json({ message: 'Utilisateur non trouvé' });
+        }
+        res.json(user);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erreur du serveur' });
+    }
+});
+
 router.put('/article', authenticateToken, authorizeRoles(['user']), async (req, res) => {
-    try {   
+    try {
         const user = new User(req.user);
         const article = req.body;
         const result = await User.findOneAndUpdate(
@@ -80,7 +125,7 @@ router.put('/article', authenticateToken, authorizeRoles(['user']), async (req, 
             { new: true }
         );
         // if (result) {
-            res.status(200).json({ message: 'Commandes ajoutées avec succès', user: user, article: article });
+        res.status(200).json({ message: 'Commandes ajoutées avec succès', user: user, article: article });
         // } else {
         //     console.log('tsy aaa')
         // }

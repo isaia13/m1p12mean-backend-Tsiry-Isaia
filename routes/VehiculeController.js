@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const Vehicule=require('../models/Vehicule');
-const User=require('../models/User')
+const User=require('../models/User');
+const Rendez_vous = require('../models/Rendez_vous');
 const {authenticateToken,authorizeRoles}=require('../configuration/VerificationToken');
 const{getListeRendez_vousVehicule}=require('../service/VehiculeService')
 
@@ -108,7 +109,6 @@ router.delete('/:id',authenticateToken,authorizeRoles(['client']),async (req, re
         res.status(400).json({ message: error.message });
     }
 });
-
 
 
 module.exports=router;

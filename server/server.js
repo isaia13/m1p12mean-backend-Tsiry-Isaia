@@ -32,6 +32,6 @@ app.use(route+'/user', require('../routes/UserRoutes'));
 app.use(route+'/vehicule',require('../routes/VehiculeController'))
 app.use(route+'/rendez-vous',require('../routes/Rendez_vousController'))
 app.use(route+'/service',require('../routes/ServiceController'))
-
+app.use(route+'/depense',require('../routes/DepenseController'))
 // Démarrage du serveur
 app.listen(PORT, () => console.log(`Serveur démarré sur le port ${PORT}`));

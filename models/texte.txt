@@ -1,0 +1,105 @@
+Scalizon - Développement Web et Application
+
+1. Contexte du Projet
+
+Scalizon est une plateforme innovante destinée aux professionnels, investisseurs et particuliers, ayant pour objectif de :
+
+Faciliter la mise en relation entre entrepreneurs et investisseurs.
+
+Encourager le partage de savoir-faire à travers des publications, des webinaires et des formations.
+
+Soutenir l'investissement dans les projets entrepreneuriaux en offrant des outils d'analyse et de discussion.
+
+Permettre la vente de produits et services via une marketplace intégrée.
+
+La plateforme sera disponible sous deux formats :
+
+Un site web, qui servira de centre principal d'activité.
+
+Une application mobile, optimisée pour une expérience fluide et intuitive.
+
+2. Objectifs Principaux
+
+Tester et valider le concept de Scalizon.
+
+Développer une plateforme web et mobile pour interagir avec les utilisateurs.
+
+Fournir des outils d'engagement tels que les publications, les lives et les formations.
+
+Garantir la sécurité des transactions et des communications entre les utilisateurs.
+
+3. Architecture du Projet
+
+3.1. Site Web
+
+Le site web constituera la plateforme centrale et offrira une navigation fluide et responsive.
+
+Fonctionnalités Clés
+
+Page d'accueil / Landing page : Introduction à Scalizon, inscription et call-to-action.
+
+Profils utilisateur : Trois types (professionnels, investisseurs, particuliers) avec des interfaces adaptées.
+
+Tableau de bord personnalisé : Accès rapide aux outils, notifications et messages.
+
+Publication de contenu : Articles, vidéos, études de cas et organisation de lives.
+
+Marketplace intégrée : Achat et vente de produits et services (formations, coaching, etc.).
+
+Messagerie privée : Pour faciliter les discussions entre les utilisateurs.
+
+Recherche avancée : Trouver des projets, formations, articles et services selon les préférences.
+
+3.2. Application Mobile
+
+L'application mobile (iOS & Android) offrira une expérience optimisée pour les utilisateurs mobiles.
+
+Fonctionnalités Clés
+
+Interface intuitive et ergonomique.
+
+Notifications push : Alertes sur les nouveaux contenus, messages et événements.
+
+Accès aux profils utilisateur et à la gestion des services.
+
+Live streaming : Organisation et participation à des événements en direct.
+
+E-commerce intégré : Achat et vente de produits et services directement depuis l'application.
+
+Formation en ligne : Suivi de cours et formations.
+
+Messagerie instantanée : Conversations en temps réel entre utilisateurs.
+
+4. Fonctionnalités par Type d'Utilisateur
+
+4.1. Professionnels
+
+Publication d'expériences et de contenus (articles, vidéos, études de cas, lives).
+
+Organisation de webinaires et coaching en direct.
+
+Vente de produits et services (formation, consulting, coaching, produits physiques).
+
+Gestion de partenariats et parrainage pour attirer de nouveaux membres.
+
+4.2. Investisseurs
+
+Accès aux informations des projets (prévisions, chiffres d'affaires, équipe).
+
+Communication avec les créateurs de projets via la messagerie.
+
+Accès exclusif à des lives et contenus premium.
+
+4.3. Particuliers
+
+Participation aux discussions et aux événements live.
+
+Accès à la boutique en ligne pour acheter des formations et services.
+
+Inscription à des cours et formations pour développer leurs compétences entrepreneuriales.
+
+
+7. Conclusion
+
+Scalizon ambitionne de révolutionner le monde de l’entrepreneuriat en offrant une plateforme tout-en-un pour les professionnels, investisseurs et particuliers. Ce projet représente une opportunité unique de contribuer à une plateforme innovante qui impactera positivement le monde des affaires.
+

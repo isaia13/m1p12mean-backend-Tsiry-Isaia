@@ -15,6 +15,30 @@ router.post('/', async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 });
+router.post('/global', async (req, res) => {
+    try {
+        const { service, sous_services } = req.body;
+        const newService = await Service.create(service);
+        
+        const sousServicesData = sous_services.map(sous => ({
+            ...sous,
+            Service: newService._id
+        }));
+        
+        const sousServicesDatas = await SousService.insertMany(sousServicesData);
+        
+        // Mise à jour du service avec les sous-services créés
+        newService.sousServices = sousServicesDatas.map(sous => sous._id);
+        await newService.save();
+        
+        res.status(201).json({
+            service: newService,
+            sous_services: sousServicesDatas
+        });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
 // modification d'un service
 router.put('/:id', authenticateToken, authorizeRoles(['manager']), async (req, res) => {
     try {
@@ -52,49 +76,53 @@ router.delete('/:id', authenticateToken, authorizeRoles(['manager']), async (req
 });
 
 // attribution d'un role avec un ou des mecanicien 
-router.put('/ajout-mecanicien:id', authenticateToken, authorizeRoles(['manager']), async (req, res) => {
+router.put('/ajout-mecanicien/:id', authenticateToken, authorizeRoles(['manager']), async (req, res) => {
     try {
-        const service = await Service.findOne({
-            _id: new mongoose.Types.ObjectId(req.params.id)
-        });
+        const service = await Service.findById(req.params.id);
         if (!service) {
-            return { success: false, message: "Service non trouvé ou vous n'êtes pas autorisé à assigner du role." };
+            return res.status(404).json({ success: false, message: "Service non trouvé ou accès non autorisé." });
         }
-        const result = await Service.findOneAndUpdate(
-            { _id: req.params.id },
+
+        const { mecanicien } = req.body; // Récupérer les mécaniciens envoyés dans le body
+
+        const result = await Service.findByIdAndUpdate(
+            req.params.id,
             { $push: { mecanicien: { $each: mecanicien } } },
             { new: true }
         );
-        res.status(201).json({ message: "Assination  de role   avec succes" });
+
+        res.status(200).json({ message: "Assignation du rôle avec succès", data: result });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
 });
 
+
 // Liste de service
 router.get('/listes', async (req, res) => {
     try {
-        const service = await Service.find();
-        res.status(201).json(service);
+        const services = await Service.find().populate('sousServices').lean();
+        res.status(200).json(services);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
 });
 //liste sous-service
-router.get('/liste_sous_service', async (req, res) => {
+router.get('/liste_sous_service/:id',authenticateToken, async (req, res) => {
     try {
-        if (req.query.service) {
-            if (!mongoose.Types.ObjectId.isValid(req.query.service)) {
-                return res.status(400).json({ message: "Invalid ObjectId format" });
-            }
-            const objectId = new mongoose.Types.ObjectId(req.query.service);
+        // if (req.par.service) {
+           const objectId = new mongoose.Types.ObjectId(req.params.id);
             const sous_service = await Sous_service.find({
                 Service: objectId
             });
-            res.status(201).json(sous_service);
-        } else {
-            res.status(201).json({message:"service pas de sous-service"});
-        }
+            if(sous_service.length==0){
+                res.status(201).json({message:"service pas de sous-service"});
+            }
+            else{
+                res.status(201).json(sous_service);
+            }
+            
+        // }
     } catch (error) { 
         res.status(400).json({ message: error.message });
     }    

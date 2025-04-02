@@ -32,7 +32,7 @@ router.post('/login', async (req, res) => {
                 });
             }
         } else {
-            res.status(404).json({ message: 'Utilisateur non existant veuiller se connecter' })
+            res.status(404).json({ message: "Utilisateur non existant veuiller s'inscrire" })
         }
     } catch (error) {
         console.log(error);

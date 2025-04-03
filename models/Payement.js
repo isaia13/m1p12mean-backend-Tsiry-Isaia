@@ -3,7 +3,7 @@ const PayementSchema = new mongoose.Schema({
     rendez_vous:{ type: mongoose.Schema.Types.ObjectId, ref: "rendez_vous", required:true},
     prix: { type: Number, required: true ,min:[0.0,'La valeur devrat etre postif']},
     date: {
-        type: Number,
+        type: Date,
         default: () => Date.now() 
     },
     etat:{ type: String, enum: ['en attente','recu'], default: 'en attente' }

@@ -36,6 +36,7 @@ app.use(route+'/depense',require('../routes/DepenseController'))
 app.use(route + '/rdv', require('../routes/RendezVousRoute'));
 app.use(route + '/vehicules', require('../routes/VehiculeRoute'));
 app.use(route + '/services', require('../routes/ServiceRoute'));
+app.use(route + '/payement', require('../routes/PayementController'));
 
 // Démarrage du serveur
 app.listen(PORT, () => console.log(`Serveur démarré sur le port ${PORT}`));

@@ -144,6 +144,37 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+router.get('/mecanicien/role', authenticateToken, authorizeRoles(['manager']), async (req, res) => {
+    try {
+        const user = await User.aggregate([
+            {
+                $match : { role : 'mecanicien' }
+            }
+        ])
+        if (!user) {
+            return res.status(404).json({ message: 'Utilisateur non trouvé' });
+        }
+        res.json(user);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erreur du serveur' });
+    }
+});
+
+
+router.delete('/mecanicien/delete/:id', authenticateToken, authorizeRoles(['manager']), async (req, res) => {
+    try {
+        const user = await User.findByIdAndDelete(req.params.id);
+        if (!user) {
+            return res.status(404).json({ message: 'Utilisateur non trouvé' });
+        }
+        res.json(user);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erreur du serveur' });
+    }
+});
+
 router.put('/article', authenticateToken, authorizeRoles(['user']), async (req, res) => {
     try {
         const user = new User(req.user);

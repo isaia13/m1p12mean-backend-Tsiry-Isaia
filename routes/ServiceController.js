@@ -4,6 +4,9 @@ const Service = require('../models/Service')
 const { authenticateToken, authorizeRoles } = require('../configuration/VerificationToken');
 const Sous_service = require('../models/Sous_service');
 const mongoose = require('mongoose');
+const Vehicule=require('../models/Vehicule');
+const User=require('../models/User');
+const Rendez_vous = require('../models/Rendez_vous');
 
 // Ajout d'un service
 router.post('/', async (req, res) => {
@@ -126,6 +129,42 @@ router.get('/liste_sous_service/:id',authenticateToken, async (req, res) => {
     } catch (error) { 
         res.status(400).json({ message: error.message });
     }    
+});
+
+
+router.get('/suivi',authenticateToken,authorizeRoles(['client']), async (req, res) => {
+    try {
+        console.log(req.user);  
+        const result = await Vehicule.aggregate([
+            {
+                $match: { user: new mongoose.Types.ObjectId(req.user.userId), etat: 0 }
+            },
+            {
+                $lookup: { from : "rendez_vous", localField: "_id", foreignField: "Vehicule", as : "rendez_vous" }
+            },
+            {
+                $unwind: "$rendez_vous"
+            },
+            {
+                $lookup: { from : "service_rdvs", localField: "rendez_vous._id", foreignField: "rendez_vous", as : "serviceRdv" }
+            },
+            {
+                $unwind: "$serviceRdv"
+            },
+            {
+                $lookup: { from : "services", localField: "serviceRdv.service", foreignField: "_id", as : "service" }
+            },
+            {
+                $unwind: "$service"
+            },
+            {
+                $lookup: { from : "sous_services", localField: "serviceRdv.sousServicesChoisis.sousService", foreignField: "_id", as : "sous_service" }
+            },
+        ])
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 });
 
 

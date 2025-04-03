@@ -6,7 +6,6 @@ const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const { authenticateToken, authorizeRoles } = require('../configuration/VerificationToken');
 require('dotenv').config();
-const mongoose = require('mongoose');
 // faire un login
 router.post('/login', async (req, res) => {
     try {

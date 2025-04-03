@@ -303,15 +303,28 @@ router.put('/updateAvancement/:id', async (req, res) => {
 
 async function modifieRendezVous(data) {
     for (const res of data) {
-      try {
-        const up = await Rendez_vous.updateOne({ _id: res._id.rendez_vous, Avancement : res.avancement })
-        const result = await Rendez_vous.findOne({ _id: res._id.rendez_vous });
-        console.log(result);
-      } catch (err) {
-        console.error("Erreur lors de la récupération du rendez-vous:", err);
-      }
+        try {
+            console.log("Tentative de mise à jour :", res);
+
+            const up = await Rendez_vous.updateOne(
+                { _id: new mongoose.Types.ObjectId(res._id.rendez_vous) },
+                { $set: { Avancement: res.avancement } }
+            );
+
+            if (up.modifiedCount > 0) {
+                console.log("Mise à jour réussie !");
+            } else {
+                console.log("Aucune modification apportée.");
+            }
+
+            const result = await Rendez_vous.findOne({ _id: res._id.rendez_vous });
+            console.log("Rendez-vous après mise à jour :", result);
+
+        } catch (err) {
+            console.error("Erreur lors de la modification du rendez-vous:", err);
+        }
     }
-  }
+}
   
 
 

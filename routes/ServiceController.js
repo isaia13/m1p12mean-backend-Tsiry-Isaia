@@ -110,6 +110,36 @@ router.get('/listes', async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 });
+
+
+router.put('/base/:id', async (req, res) => {
+    try {
+        const sous_service = await Sous_service.find({
+            Service: new mongoose.Types.ObjectId(req.params.id)
+        });
+
+        const service = await Service.findOne({ _id: new mongoose.Types.ObjectId(req.params.id) });
+
+        if (!service) {
+            return res.status(404).json({ success: false, message: "Service non trouvé." });
+        }
+
+        console.log(sous_service);
+
+        for (const sous of sous_service) {  
+            service.sousServices.push(sous._id);
+        }
+
+        await service.save();
+
+        return res.status(200).json({ message: "Service mis à jour avec succès", service });
+
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+
 //liste sous-service
 router.get('/liste_sous_service/:id',authenticateToken, async (req, res) => {
     try {

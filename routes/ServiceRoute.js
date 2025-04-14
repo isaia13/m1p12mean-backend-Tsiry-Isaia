@@ -5,10 +5,10 @@ const Service = require('../models/Service');
 const Rendez_vous = require('../models/Rendez_vous');
 const mongoose = require('mongoose');
 const Service_rdv = require('../models/Service_rdv');
-const {authenticateToken,authorizeRoles}=require('../configuration/VerificationToken')
+const { authenticateToken, authorizeRoles } = require('../configuration/VerificationToken')
 ///io
 
-router.post('/sous_service',authenticateToken, async (req, res) => {
+router.post('/sous_service', authenticateToken, async (req, res) => {
     try {
         const ss = new Sous_Service(req.body);
         await ss.save();
@@ -18,7 +18,7 @@ router.post('/sous_service',authenticateToken, async (req, res) => {
     }
 })
 
-router.post('/nouveau',authenticateToken, async (req, res) => {
+router.post('/nouveau', authenticateToken, async (req, res) => {
     try {
         const service = new Service(req.body);
         await service.save();
@@ -28,7 +28,7 @@ router.post('/nouveau',authenticateToken, async (req, res) => {
     }
 })
 
-router.get('/listes',authenticateToken, async (req, res) => {
+router.get('/listes', authenticateToken, async (req, res) => {
     try {
         const services = await Service.find();
         res.status(200).json(services);
@@ -70,7 +70,7 @@ router.get('/liste_sous_service', authenticateToken, async (req, res) => {
     }
 });
 
-router.get('/nombre_new_rdv',authenticateToken , async (req, res) => {
+router.get('/nombre_new_rdv', authenticateToken, async (req, res) => {
     try {
         const { id } = req.query;
         const result = await Rendez_vous.aggregate([
@@ -81,13 +81,24 @@ router.get('/nombre_new_rdv',authenticateToken , async (req, res) => {
                 $match: { _id: parseInt(id) }
             }
         ]);
+        // const clients = req.app.locals.clients;
+        // if (!clients) return res.status(500).json({ error: 'WebSocket non initialisé' });
+        // clients.forEach((client) => {
+        //     if (client.readyState === 1) {
+        //         setInterval(() => {
+        //             client.send(JSON.stringify({data: result }));
+        //             console.log(result);
+        //         }, 5000);
+        //     }
+        // });
         res.status(200).send(result);
     } catch (error) {
+        console.log(error.message);
         res.status(500).json({ message: error.message })
     }
 })
 
-router.get('/nombre_new_service_vehicule',authenticateToken, async (req, res) => {
+router.get('/nombre_new_service_vehicule', authenticateToken, async (req, res) => {
     try {
         const result = await Rendez_vous.aggregate([
             {
@@ -107,7 +118,7 @@ router.get('/nombre_new_service_vehicule',authenticateToken, async (req, res) =>
 router.get('/liste_rdv', authenticateToken, async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 10; 
+        const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
         const countPipeline = [
             {
@@ -201,6 +212,9 @@ router.get('/liste_rdv', authenticateToken, async (req, res) => {
                     }
                 }
             },
+            {
+                $sort: { "_id.date_rdv": 1 }
+            },
             { $skip: skip },
             { $limit: limit }
         ]);
@@ -220,7 +234,7 @@ router.get('/liste_rdv', authenticateToken, async (req, res) => {
 });
 
 
-router.put('/addSousService/:id',authenticateToken, async (req, res) => {
+router.put('/addSousService/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
     try {
         const rdv = await Service_rdv.updateOne(
@@ -233,16 +247,16 @@ router.put('/addSousService/:id',authenticateToken, async (req, res) => {
     }
 })
 
-router.put('/updateSousService/:id',authenticateToken, async (req, res) => {
+router.put('/updateSousService/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
     try {
         const rdv = await Service_rdv.updateMany(
-            { 
-                _id: id, 
+            {
+                _id: id,
                 'sousServicesChoisis._id': req.body._id
             },
             {
-                $set: { 
+                $set: {
                     'sousServicesChoisis.$.Avancement': parseInt(req.body.Avancement)
                 }
             }
@@ -255,7 +269,7 @@ router.put('/updateSousService/:id',authenticateToken, async (req, res) => {
 });
 
 
-router.get('/liste_par_service/:id',authenticateToken, async (req, res) => {
+router.get('/liste_par_service/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
     try {
         const service = await Service_rdv.findById(id)
@@ -276,27 +290,27 @@ router.put('/updateAvancement/:id', async (req, res) => {
     try {
         const result = await Service_rdv.aggregate([
             {
-              $match: { _id: new mongoose.Types.ObjectId(req.params.id) }
+                $match: { _id: new mongoose.Types.ObjectId(req.params.id) }
             },
             {
-              $unwind: "$sousServicesChoisis"
+                $unwind: "$sousServicesChoisis"
             },
             {
-              $group: {
-                _id: { _id : "$_id", rendez_vous : "$rendez_vous" },
-                avancement: { $avg: "$sousServicesChoisis.Avancement" }
-              }
+                $group: {
+                    _id: { _id: "$_id", rendez_vous: "$rendez_vous" },
+                    avancement: { $avg: "$sousServicesChoisis.Avancement" }
+                }
             },
             {
-              $addFields: {
-                avancement: "$avancement"
-              }
+                $addFields: {
+                    avancement: "$avancement"
+                }
             }
-          ]);
-          modifieRendezVous(result);
-          res.status(200).json(result);
+        ]);
+        modifieRendezVous(result);
+        res.status(200).json(result);
     } catch (error) {
-        res.status(500).json({ message: error.message})
+        res.status(500).json({ message: error.message })
     }
 })
 
@@ -325,7 +339,126 @@ async function modifieRendezVous(data) {
         }
     }
 }
-  
 
+module.exports = async function getListeRDV(page = 1, limit = 10) {
+    const skip = (page - 1) * limit;
+
+    const countPipeline = [
+        {
+            $lookup: { from: "vehicules", localField: "Vehicule", foreignField: "_id", as: "vehiculeInfo" }
+        },
+        { $unwind: "$vehiculeInfo" },
+        {
+            $lookup: { from: "utilisateurs", localField: "vehiculeInfo.user", foreignField: "_id", as: "clientInfo" }
+        },
+        { $unwind: "$clientInfo" },
+        {
+            $lookup: { from: "service_rdvs", localField: "_id", foreignField: "rendez_vous", as: "serviceRdvInfo" }
+        },
+        { $unwind: "$serviceRdvInfo" },
+        {
+            $lookup: { from: "services", localField: "serviceRdvInfo.service", foreignField: "_id", as: "serviceInfo" }
+        },
+        { $unwind: "$serviceInfo" }
+    ];
+
+    const totalCount = await Rendez_vous.aggregate([
+        ...countPipeline,
+        { $count: "total" }
+    ]);
+
+    const total = totalCount[0]?.total || 0;
+
+    const result = await Rendez_vous.aggregate([
+        ...countPipeline,
+        {
+            $addFields: {
+                sousServicesChoisisExist: {
+                    $cond: {
+                        if: { $gt: [{ $size: "$serviceRdvInfo.sousServicesChoisis" }, 0] },
+                        then: true,
+                        else: false
+                    }
+                }
+            }
+        },
+        {
+            $lookup: {
+                from: "sous_services",
+                localField: "serviceRdvInfo.sousServicesChoisis.sousService",
+                foreignField: "_id",
+                as: "sousServiceInfo"
+            }
+        },
+        {
+            $group: {
+                _id: {
+                    id_rdv: "$_id",
+                    date_rdv: "$date_rdv",
+                    date_envoie: "$date_envoie",
+                    etat_rdv: "$etat_rdv",
+                    estArrive: "$estArrive",
+                    clientInfo: "$clientInfo",
+                    vehiculeInfo: "$vehiculeInfo",
+                    serviceInfo: "$serviceInfo",
+                    serviceRdvInfo: "$serviceRdvInfo",
+                    sousServiceInfo: "$sousServiceInfo"
+                },
+                sous_services: {
+                    $push: {
+                        _id: "$sousServiceInfo._id",
+                        nom: "$sousServiceInfo.nom"
+                    }
+                }
+            }
+        },
+        {
+            $project: {
+                "_id.id_rdv": 1,
+                "_id.date_rdv": 1,
+                "_id.date_envoie": 1,
+                "_id.estArrive": 1,
+                "_id.etat_rdv": 1,
+                "_id.clientInfo": 1,
+                "_id.vehiculeInfo": 1,
+                "_id.serviceInfo": 1,
+                "_id.serviceRdvInfo": 1,
+                "_id.sousServiceInfo": 1,
+                "sous_services": 1,
+                statusGarage: {
+                    $cond: {
+                        if: { $lte: ["$_id.date_envoie", new Date()] },
+                        then: true,
+                        else: false
+                    }
+                }
+            }
+        },
+        {
+            $sort: { "_id.date_rdv": 1 }
+        },
+        { $skip: skip },
+        { $limit: limit }
+    ]);
+
+    return {
+        data: result,
+        pagination: {
+            currentPage: page,
+            totalPages: Math.ceil(total / limit),
+            totalItems: total,
+            itemsPerPage: limit
+        }
+    };
+}
+
+// router.get('/test', async (req, res) => {
+//     try {
+//         const result = await Service_rdv.countDocuments({ "sousServicesChoisis.etat" : "valider" });
+//         res.json(result);
+//     } catch (error) {
+//         console.log(error.message);
+//     }
+// })
 
 module.exports = router;

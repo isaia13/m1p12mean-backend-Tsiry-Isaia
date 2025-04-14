@@ -48,7 +48,8 @@ router.get('/service',authenticateToken, async (req, res) => {
                 $match : {
                     $and: [
                         { etat_rdv : 1 },
-                        { estArrive : 1 }
+                        { estArrive : 1 },
+                        { etat : 0 }
                     ]
                 }
             }

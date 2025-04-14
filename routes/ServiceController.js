@@ -166,9 +166,9 @@ router.get('/suivi',authenticateToken,authorizeRoles(['client']), async (req, re
     try {
         console.log(req.user);  
         const result = await Vehicule.aggregate([
-            {
-                $match: { user: new mongoose.Types.ObjectId(req.user.userId), etat: 0 }
-            },
+            // {
+            //     $match: { user: new mongoose.Types.ObjectId(req.user.userId), etat: 0 }
+            // },
             {
                 $lookup: { from : "rendez_vous", localField: "_id", foreignField: "Vehicule", as : "rendez_vous" }
             },
@@ -190,6 +190,9 @@ router.get('/suivi',authenticateToken,authorizeRoles(['client']), async (req, re
             {
                 $lookup: { from : "sous_services", localField: "serviceRdv.sousServicesChoisis.sousService", foreignField: "_id", as : "sous_service" }
             },
+            {
+                $match : { "rendez_vous.etat" : 0 }
+            }
         ])
         res.status(200).json(result);
     } catch (error) {

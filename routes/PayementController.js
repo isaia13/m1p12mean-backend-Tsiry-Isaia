@@ -83,7 +83,4 @@ router.get('/etat/manager', authenticateToken, authorizeRoles(['manager']), asyn
     }
 });
 
-
-
-
 module.exports = router;

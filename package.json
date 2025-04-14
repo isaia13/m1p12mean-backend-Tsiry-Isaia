@@ -20,6 +20,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.10.1",
     "nodemon": "^3.1.9",
-    "projet-back-mean": "file:"
+    "projet-back-mean": "file:",
+    "ws": "^8.18.1"
   }
 }

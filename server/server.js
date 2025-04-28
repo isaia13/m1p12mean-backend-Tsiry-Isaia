@@ -1,14 +1,15 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const bcryptjs = require('bcryptjs'); 
+const bcryptjs = require('bcryptjs');
 const WebSocket = require('ws');
 require('dotenv').config();
 const http = require('http');
+const { setUser, getUser, user } = require('../service/ws/user');
 
 const {
   startRdvUpdater, startListRdv, startRdvServices, startListServiceRdv
-} = require('../service/ws/rdv_ws'); 
+} = require('../service/ws/rdv_ws');
 
 const {
   startCountRdvServices, getChangeHistoRdv
@@ -19,7 +20,7 @@ const {
 } = require('../service/ws/suivi_ws');
 
 const {
-  startCountServicesPayementRecu
+  startCountServicesPayementRecu, getChangePayement
 } = require('../service/ws/payement_ws');
 
 const app = express();
@@ -29,6 +30,9 @@ const clients = new Set();
 
 wss.on('connection', (socket) => {
   console.log('🟢 Client connecté via WebSocket');
+  const currentUser = app.get('currentUser');
+  //console.log(currentUser, 'ieieie');
+  socket.util = currentUser;
   clients.add(socket);
 
   socket.on('close', () => {
@@ -37,16 +41,18 @@ wss.on('connection', (socket) => {
   });
 });
 
+var users = getUser();
 app.locals.clients = clients;
 startRdvUpdater(clients);
 startListRdv(clients);
 startRdvServices(clients);
 startListServiceRdv(clients);
 startCountRdvServices(clients);
-getChangeHistoRdv(clients);
+ getChangeHistoRdv(clients);
 startSuiviServicesTerminer(clients);
 getListAvancementeVehicule(clients);
 startCountServicesPayementRecu(clients);
+getChangePayement(clients);
 
 const PORT = process.env.PORT || 5000;
 

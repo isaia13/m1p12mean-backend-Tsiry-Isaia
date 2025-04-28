@@ -19,7 +19,7 @@ router.post('/', authenticateToken, authorizeRoles(['client']), async (req, res)
 
 router.get('/', authenticateToken, authorizeRoles(['client']), async (req, res) => {
     try {
-        const payement = await Payement.find({ rendez_vous: new mongoose.Types.ObjectId(req.query.rdv) });
+        const payement = await Payement.find({ rendez_vous: new mongoose.Types.ObjectId(req.query.rdv)});
         res.status(201).json(payement.length);
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -80,6 +80,16 @@ router.get('/etat/manager', authenticateToken, authorizeRoles(['manager']), asyn
         res.status(200).json(payement);
     } catch (error) {
         res.status(400).json({ message: error.message });
+    }
+});
+
+router.put('/set/:id',authenticateToken, authorizeRoles(['client']), async (req, res) => {
+    try {
+        const id = new mongoose.Types.ObjectId(req.params.id);
+        const update_vue = await Payement.findOneAndUpdate(id , { vue_client : 1 }, { new : true });
+        res.status(200).json({ message : "Payement marqué comme vue" });
+    } catch (error) {
+        res.status(400).json({ message : error.message });
     }
 });
 

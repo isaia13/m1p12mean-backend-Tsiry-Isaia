@@ -6,6 +6,7 @@ const PayementSchema = new mongoose.Schema({
         type: Date,
         default: () => Date.now() 
     },
-    etat:{ type: String, enum: ['en attente','recu'], default: 'en attente' }
+    etat:{ type: String, enum: ['en attente','recu'], default: 'en attente' },
+    vue_client : { type : Number, default: 0 }
 }, { timestamps: true });
 module.exports = mongoose.model('Payement', PayementSchema);

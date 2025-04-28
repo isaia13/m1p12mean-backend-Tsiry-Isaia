@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const { authenticateToken, authorizeRoles } = require('../configuration/VerificationToken');
+const { setUser } = require('../service/ws/user');
 require('dotenv').config();
 // faire un login
 router.post('/login', async (req, res) => {
@@ -22,6 +23,7 @@ router.post('/login', async (req, res) => {
                     process.env.JWT_SECRET,
                     { expiresIn: '1h' }
                 );
+                req.app.set('currentUser', users); 
                 return res.status(200).json({
                     message: 'Connexion réussie',
                     token,

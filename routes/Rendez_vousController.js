@@ -35,7 +35,8 @@ router.get('/', authenticateToken, authorizeRoles(['client']), async (req, res) 
                     path: 'Vehicule',
                     populate: {
                         path: 'user',
-                        select: 'name prenom'
+                        select: 'name prenom',
+                        match: { _id: req.user.userId }
                     },
                     select: 'marque numeroImmat caracteristique etat'
                 },
@@ -52,7 +53,12 @@ router.get('/', authenticateToken, authorizeRoles(['client']), async (req, res) 
             .select('sousServicesChoisis createdAt updatedAt')
             .exec();
 
-        res.status(200).json(result);
+        const filteredResult = result.filter(service =>
+            service.rendez_vous?.Vehicule?.user
+        );
+
+
+        res.status(200).json(filteredResult);
 
     } catch (error) {
         res.status(400).json({ message: error.message });

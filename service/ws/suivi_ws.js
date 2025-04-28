@@ -8,7 +8,13 @@ function startSuiviServicesTerminer(clients) {
         try {
             const result = await Rendez_vous.aggregate([
                 {
-                    $match: { Avancement: 100 }
+                    $lookup: { from : "payements", localField : "_id", foreignField: "rendez_vous", as : "payement" }
+                },
+                {
+                    $unwind : "$payement"
+                },
+                {
+                    $match: { Avancement: 100 , "payement.etat" : "en attente"}
                 },
                 {
                     $count: "total"
@@ -31,9 +37,9 @@ function getListAvancementeVehicule(clients) {
     setInterval(async () => {
         try {
             const result = await Vehicule.aggregate([
-                // {
-                //     $match: { user: new mongoose.Types.ObjectId(req.user.userId), etat: 0 }
-                // },
+                {
+                    $match: { user: client.util._id, etat: 0 }
+                },
                 {
                     $lookup: { from: "rendez_vous", localField: "_id", foreignField: "Vehicule", as: "rendez_vous" }
                 },
